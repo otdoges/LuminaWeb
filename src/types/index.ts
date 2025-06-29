@@ -1,11 +1,3 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  createdAt: Date;
-}
-
 export interface Website {
   id: string;
   url: string;
@@ -27,12 +19,6 @@ export interface PerformanceMetric {
   accessibilityScore: number;
   seoScore: number;
   bestPracticesScore: number;
-}
-
-export interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
 }
 
 export interface ColorTheme {

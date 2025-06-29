@@ -21,7 +21,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
-  const { logout, user } = useAuth();
+  const { signOut, user } = useAuth();
   const { currentTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -121,12 +121,12 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
               className="font-medium"
               style={{ color: currentTheme.accent }}
             >
-              {user?.name?.charAt(0).toUpperCase()}
+              {(user?.user_metadata?.name || user?.email)?.charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-primary-900 dark:text-primary-100 truncate theme-transition">
-              {user?.name}
+              {user?.user_metadata?.name || user?.email?.split('@')[0]}
             </p>
             <p className="text-xs text-primary-500 dark:text-primary-400 truncate theme-transition">
               {user?.email}
@@ -141,7 +141,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         <Button
           variant="ghost"
           size="sm"
-          onClick={logout}
+          onClick={signOut}
           className="w-full justify-start text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-800 theme-transition"
         >
           <LogOut className="w-4 h-4 mr-2" />

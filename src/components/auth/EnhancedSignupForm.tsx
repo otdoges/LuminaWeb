@@ -19,7 +19,7 @@ export function EnhancedSignupForm({ onSwitchToLogin }: EnhancedSignupFormProps)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState('');
-  const { signup, isLoading } = useAuth();
+  const { signUp, signInWithGitHub, isLoading } = useAuth();
   const { currentTheme } = useTheme();
 
   const getPasswordStrength = (password: string) => {
@@ -45,9 +45,18 @@ export function EnhancedSignupForm({ onSwitchToLogin }: EnhancedSignupFormProps)
     }
     
     try {
-      await signup(email, password, name);
+      await signUp(email, password, name);
     } catch (err) {
-      setError('Failed to create account. Please try again.');
+      setError((err as Error).message);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setError('');
+    try {
+      await signInWithGitHub();
+    } catch (err) {
+      setError((err as Error).message);
     }
   };
 
@@ -336,7 +345,10 @@ export function EnhancedSignupForm({ onSwitchToLogin }: EnhancedSignupFormProps)
       >
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button 
+            type="button"
             variant="outline" 
+            onClick={handleGitHubSignIn}
+            disabled={isLoading}
             className="w-full h-12 bg-white/50 dark:bg-primary-700/50 border-primary-300 dark:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-600 theme-transition"
             style={{
               borderColor: `${currentTheme.accent}30`,

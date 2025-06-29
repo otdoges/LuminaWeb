@@ -16,7 +16,7 @@ export function EnhancedLoginForm({ onSwitchToSignup }: EnhancedLoginFormProps) 
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
-  const { login, isLoading } = useAuth();
+  const { signIn, signInWithGitHub, isLoading } = useAuth();
   const { currentTheme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,9 +24,18 @@ export function EnhancedLoginForm({ onSwitchToSignup }: EnhancedLoginFormProps) 
     setError('');
     
     try {
-      await login(email, password);
+      await signIn(email, password);
     } catch (err) {
-      setError('Invalid email or password');
+      setError((err as Error).message);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setError('');
+    try {
+      await signInWithGitHub();
+    } catch (err) {
+      setError((err as Error).message);
     }
   };
 
@@ -209,7 +218,10 @@ export function EnhancedLoginForm({ onSwitchToSignup }: EnhancedLoginFormProps) 
       >
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button 
+            type="button"
             variant="outline" 
+            onClick={handleGitHubSignIn}
+            disabled={isLoading}
             className="w-full h-12 bg-white/50 dark:bg-primary-700/50 border-primary-300 dark:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-600 theme-transition"
             style={{
               borderColor: `${currentTheme.accent}30`,
