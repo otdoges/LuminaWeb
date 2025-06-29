@@ -1,7 +1,7 @@
 import React from 'react';
 import { ExternalLink, Download, MoreHorizontal } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader } from '../ui/card';
+import { Button } from '../ui/button';
 
 interface Screenshot {
   id: string;

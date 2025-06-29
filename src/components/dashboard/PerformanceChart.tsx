@@ -1,6 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Card, CardContent, CardHeader } from '../ui/Card';
+import { Card, CardContent, CardHeader } from '../ui/card';
 
 interface PerformanceData {
   date: string;
