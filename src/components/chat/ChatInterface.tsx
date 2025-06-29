@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, User, Loader2, Camera, BarChart3, Zap } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
-import { Input } from '../ui/input';
+import { Input } from '../ui/Input';
 import { useAuth } from '../../context/AuthContext';
 import { chatService } from '../../lib/supabase';
 import { groqService } from '../../lib/groq';
@@ -81,6 +81,9 @@ export function ChatInterface({
       }
 
       // Add user message
+      if (!conv) {
+        throw new Error("Conversation is undefined when trying to create a message.");
+      }
       const userMessage = await chatService.createMessage({
         conversation_id: conv.id,
         role: 'user',
@@ -147,9 +150,9 @@ export function ChatInterface({
         setMessages(prev => [...prev, assistantMessage]);
 
         // Handle streaming response
-        if (stream && typeof stream[Symbol.asyncIterator] === 'function') {
-          for await (const chunk of stream) {
-            const delta = chunk.choices[0]?.delta?.content || '';
+        if (stream && typeof (stream as any)[Symbol.asyncIterator] === 'function') {
+          for await (const chunk of stream as AsyncIterable<any>) {
+            const delta = chunk.choices?.[0]?.delta?.content || '';
             if (delta) {
               assistantContent += delta;
               setMessages(prev => 

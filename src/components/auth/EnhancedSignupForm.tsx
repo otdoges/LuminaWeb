@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Github, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { Input } from '../ui/Input';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 

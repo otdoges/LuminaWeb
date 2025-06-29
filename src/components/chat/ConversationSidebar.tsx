@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, MessageSquare, Trash2, Edit2, Check, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
-import { Input } from '../ui/input';
+import { Input } from '../ui/Input';
 import { useAuth } from '../../context/AuthContext';
 import { chatService } from '../../lib/supabase';
 import { useTheme } from '../../context/ThemeContext';

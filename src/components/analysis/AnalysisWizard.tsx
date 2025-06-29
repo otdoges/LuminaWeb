@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Input } from '../ui/input';
+import { Input } from '../ui/Input';
 import { AnalysisSettings, AnalysisParameter } from '../../types/analysis';
 
 interface AnalysisWizardProps {

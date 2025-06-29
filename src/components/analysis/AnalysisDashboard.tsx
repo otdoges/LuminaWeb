@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Input } from '../ui/input';
+import { Input } from '../ui/Input';
 import { WebsiteAnalysis, AnalysisMetrics } from '../../types/analysis';
 import { AnalysisChart } from './AnalysisChart';
 import { MetricsOverview } from './MetricsOverview';
