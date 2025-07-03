@@ -1,3 +1,5 @@
+import { rateLimiter } from './rateLimiter';
+
 interface ScrapingBeeOptions {
   url: string;
   screenshot?: boolean;
@@ -89,18 +91,26 @@ interface ComprehensiveAnalysis {
 }
 
 export class ScrapingBeeService {
-  private apiKey: string;
+  private apiKey: string | undefined;
   private baseUrl = 'https://app.scrapingbee.com/api/v1/';
   private timeout: number;
   private maxRetries: number;
+  private isConfigured: boolean;
 
   constructor() {
     this.apiKey = import.meta.env.VITE_SCRAPINGBEE_API_KEY;
     this.timeout = parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000;
     this.maxRetries = 3;
+    this.isConfigured = Boolean(this.apiKey);
     
-    if (!this.apiKey) {
-      throw new Error('ScrapingBee API key is required. Please set VITE_SCRAPINGBEE_API_KEY in your environment variables.');
+    if (!this.isConfigured) {
+      console.warn('ScrapingBee API key not found. Service will return mock data. Please set VITE_SCRAPINGBEE_API_KEY in your environment variables.');
+    }
+  }
+
+  private checkConfiguration(): void {
+    if (!this.isConfigured || !this.apiKey) {
+      throw new Error('ScrapingBee API key is not configured. Please set VITE_SCRAPINGBEE_API_KEY in your environment variables.');
     }
   }
 
@@ -123,18 +133,26 @@ export class ScrapingBeeService {
 
   private async retryRequest<T>(
     operation: () => Promise<T>,
+    endpoint: string = 'default',
     retries: number = this.maxRetries
   ): Promise<T> {
-    try {
-      return await operation();
-    } catch (error) {
-      if (retries > 0 && this.isRetryableError(error)) {
-        console.warn(`Request failed, retrying... (${retries} attempts left)`, error);
-        await this.delay(1000 * (this.maxRetries - retries + 1)); // Exponential backoff
-        return this.retryRequest(operation, retries - 1);
-      }
-      throw error;
-    }
+    // Use rate limiter to execute the request
+    return rateLimiter.executeWithRateLimit(
+      'scrapingbee',
+      async () => {
+        try {
+          return await operation();
+        } catch (error) {
+          if (retries > 0 && this.isRetryableError(error)) {
+            console.warn(`Request failed, retrying... (${retries} attempts left)`, error);
+            await this.delay(1000 * (this.maxRetries - retries + 1)); // Exponential backoff
+            return this.retryRequest(operation, endpoint, retries - 1);
+          }
+          throw error;
+        }
+      },
+      endpoint
+    );
   }
 
   private isRetryableError(error: any): boolean {
@@ -149,9 +167,15 @@ export class ScrapingBeeService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  isServiceConfigured(): boolean {
+    return this.isConfigured;
+  }
+
   async takeScreenshot(url: string, options: Partial<ScrapingBeeOptions> = {}): Promise<string> {
+    this.checkConfiguration();
+    
     const params = new URLSearchParams({
-      api_key: this.apiKey,
+      api_key: this.apiKey!,
       url: url,
       screenshot: 'true',
       screenshot_full_page: options.screenshot_full_page ? 'true' : 'false',
@@ -187,12 +211,14 @@ export class ScrapingBeeService {
         console.error('ScrapingBee screenshot error:', error);
         throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-    });
+    }, 'screenshot');
   }
 
   async scrapeContent(url: string, options: Partial<ScrapingBeeOptions> = {}): Promise<ScrapingBeeResponse> {
+    this.checkConfiguration();
+    
     const params = new URLSearchParams({
-      api_key: this.apiKey,
+      api_key: this.apiKey!,
       url: url,
       render_js: options.render_js !== false ? 'true' : 'false',
       wait: (options.wait || 3000).toString(),
@@ -226,7 +252,7 @@ export class ScrapingBeeService {
         console.error('ScrapingBee scraping error:', error);
         throw new Error(`Failed to scrape content: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-    });
+    }, 'scrape');
   }
 
   async extractDataWithAI(
@@ -235,8 +261,10 @@ export class ScrapingBeeService {
     extractRules?: AIExtractionRules,
     options: Partial<ScrapingBeeOptions> = {}
   ): Promise<any> {
+    this.checkConfiguration();
+    
     const params = new URLSearchParams({
-      api_key: this.apiKey,
+      api_key: this.apiKey!,
       url: url,
       ai_query: aiQuery,
       render_js: options.render_js !== false ? 'true' : 'false',
@@ -267,15 +295,440 @@ export class ScrapingBeeService {
         console.error('ScrapingBee AI extraction error:', error);
         throw new Error(`Failed to extract data with AI: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-    });
+    }, 'ai-extract');
   }
 
-  async comprehensiveAnalysis(url: string): Promise<ComprehensiveAnalysis> {
+  // Enhanced AI extraction for SEO analysis
+  async extractSEOInsights(url: string): Promise<any> {
+    const seoQuery = `Analyze this website's SEO performance and identify specific optimization opportunities. 
+    Focus on title tags, meta descriptions, heading structure, keyword usage, internal linking, 
+    and content optimization. Provide actionable recommendations.`;
+    
+    const seoRules: AIExtractionRules = {
+      titleOptimization: { 
+        description: 'Analysis of title tag optimization and recommendations', 
+        type: 'string' 
+      },
+      metaDescriptionAnalysis: { 
+        description: 'Meta description quality and improvement suggestions', 
+        type: 'string' 
+      },
+      keywordStrategy: { 
+        description: 'Primary and secondary keywords found and recommendations', 
+        type: 'list' 
+      },
+      contentGaps: { 
+        description: 'Missing content opportunities and topics to cover', 
+        type: 'list' 
+      },
+      technicalSEOIssues: { 
+        description: 'Technical SEO problems like missing schema, slow loading, etc.', 
+        type: 'list' 
+      },
+      competitorAdvantages: { 
+        description: 'What competitors might be doing better in terms of SEO', 
+        type: 'list' 
+      },
+      localSEOOpportunities: { 
+        description: 'Local SEO opportunities if applicable', 
+        type: 'list' 
+      }
+    };
+
+    try {
+      return await this.extractDataWithAI(url, seoQuery, seoRules);
+    } catch (error) {
+      console.warn('SEO insights extraction failed:', error);
+      return null;
+    }
+  }
+
+  // Enhanced AI extraction for content analysis
+  async extractContentInsights(url: string): Promise<any> {
+    const contentQuery = `Analyze this website's content quality, readability, user engagement potential, 
+    and provide specific recommendations for improvement. Focus on content structure, messaging clarity, 
+    call-to-actions, and user experience.`;
+    
+    const contentRules: AIExtractionRules = {
+      contentQualityScore: { 
+        description: 'Overall content quality assessment (1-10)', 
+        type: 'number' 
+      },
+      readabilityAssessment: { 
+        description: 'Content readability analysis and recommendations', 
+        type: 'string' 
+      },
+      contentStructure: { 
+        description: 'Analysis of content organization and hierarchy', 
+        type: 'string' 
+      },
+      callToActionAnalysis: { 
+        description: 'Effectiveness of CTAs and improvement suggestions', 
+        type: 'list' 
+      },
+      userEngagementFactors: { 
+        description: 'Elements that could improve user engagement', 
+        type: 'list' 
+      },
+      contentGaps: { 
+        description: 'Missing content that users might expect', 
+        type: 'list' 
+      },
+      toneAndMessaging: { 
+        description: 'Analysis of brand voice and messaging consistency', 
+        type: 'string' 
+      },
+      visualContentNeeds: { 
+        description: 'Recommendations for images, videos, or infographics', 
+        type: 'list' 
+      }
+    };
+
+    try {
+      return await this.extractDataWithAI(url, contentQuery, contentRules);
+    } catch (error) {
+      console.warn('Content insights extraction failed:', error);
+      return null;
+    }
+  }
+
+  // Enhanced AI extraction for competitive analysis
+  async extractCompetitiveInsights(url: string): Promise<any> {
+    const competitiveQuery = `Analyze this website and identify what type of business/industry it serves. 
+    Based on the content, design, and features, suggest what competitive advantages or disadvantages 
+    it might have compared to similar websites in its industry.`;
+    
+    const competitiveRules: AIExtractionRules = {
+      industryType: { 
+        description: 'Primary industry or business type this website serves', 
+        type: 'string' 
+      },
+      uniqueValueProposition: { 
+        description: 'What makes this website unique or different', 
+        type: 'string' 
+      },
+      competitiveAdvantages: { 
+        description: 'Strengths compared to typical competitors', 
+        type: 'list' 
+      },
+      competitiveWeaknesses: { 
+        description: 'Areas where competitors might have advantages', 
+        type: 'list' 
+      },
+      marketPositioning: { 
+        description: 'How this website positions itself in the market', 
+        type: 'string' 
+      },
+      targetAudience: { 
+        description: 'Primary target audience based on content and design', 
+        type: 'string' 
+      },
+      improvementOpportunities: { 
+        description: 'Key areas for competitive improvement', 
+        type: 'list' 
+      }
+    };
+
+    try {
+      return await this.extractDataWithAI(url, competitiveQuery, competitiveRules);
+    } catch (error) {
+      console.warn('Competitive insights extraction failed:', error);
+      return null;
+    }
+  }
+
+  // Enhanced AI extraction for technical analysis
+  async extractTechnicalInsights(url: string): Promise<any> {
+    const technicalQuery = `Analyze this website's technical implementation, performance indicators, 
+    and identify technical issues or optimization opportunities. Focus on code quality, loading speed, 
+    mobile optimization, and accessibility.`;
+    
+    const technicalRules: AIExtractionRules = {
+      technicalStack: { 
+        description: 'Technologies and frameworks detected on the website', 
+        type: 'list' 
+      },
+      performanceIssues: { 
+        description: 'Performance problems that could affect user experience', 
+        type: 'list' 
+      },
+      mobileOptimization: { 
+        description: 'Mobile-specific issues and recommendations', 
+        type: 'list' 
+      },
+      accessibilityIssues: { 
+        description: 'Accessibility problems for users with disabilities', 
+        type: 'list' 
+      },
+      codeQualityIssues: { 
+        description: 'Code quality issues like missing alt tags, broken links, etc.', 
+        type: 'list' 
+      },
+      securityConcerns: { 
+        description: 'Potential security issues or vulnerabilities', 
+        type: 'list' 
+      },
+      optimizationRecommendations: { 
+        description: 'Technical optimizations to improve performance', 
+        type: 'list' 
+      }
+    };
+
+    try {
+      return await this.extractDataWithAI(url, technicalQuery, technicalRules);
+    } catch (error) {
+      console.warn('Technical insights extraction failed:', error);
+      return null;
+    }
+  }
+
+  // Advanced AI-powered multi-dimensional analysis
+  async performAdvancedAIAnalysis(url: string): Promise<{
+    businessIntelligence: any;
+    userJourneyAnalysis: any;
+    conversionOptimization: any;
+    accessibilityAssessment: any;
+  }> {
+    try {
+      const [businessData, userJourneyData, conversionData, accessibilityData] = await Promise.allSettled([
+        this.extractBusinessIntelligence(url),
+        this.extractUserJourneyInsights(url),
+        this.extractConversionOptimization(url),
+        this.extractAccessibilityAssessment(url)
+      ]);
+
+      return {
+        businessIntelligence: businessData.status === 'fulfilled' ? businessData.value : null,
+        userJourneyAnalysis: userJourneyData.status === 'fulfilled' ? userJourneyData.value : null,
+        conversionOptimization: conversionData.status === 'fulfilled' ? conversionData.value : null,
+        accessibilityAssessment: accessibilityData.status === 'fulfilled' ? accessibilityData.value : null
+      };
+    } catch (error) {
+      console.error('Advanced AI analysis failed:', error);
+      throw new Error('Failed to perform advanced AI analysis');
+    }
+  }
+
+  // Business intelligence extraction
+  private async extractBusinessIntelligence(url: string): Promise<any> {
+    const businessQuery = `Analyze this website as a business intelligence analyst would. Identify the business model, 
+    revenue streams, target market, competitive positioning, and growth opportunities. Also assess the digital maturity 
+    and online presence effectiveness.`;
+    
+    const businessRules: AIExtractionRules = {
+      businessModel: { 
+        description: 'Primary business model (B2B, B2C, marketplace, SaaS, etc.)', 
+        type: 'string' 
+      },
+      revenueStreams: { 
+        description: 'Identified or potential revenue streams', 
+        type: 'list' 
+      },
+      marketSegment: { 
+        description: 'Target market segment and demographics', 
+        type: 'string' 
+      },
+      competitivePosition: { 
+        description: 'Competitive positioning and market differentiators', 
+        type: 'string' 
+      },
+      digitalMaturity: { 
+        description: 'Assessment of digital transformation and online capabilities', 
+        type: 'string' 
+      },
+      growthOpportunities: { 
+        description: 'Identified business growth opportunities', 
+        type: 'list' 
+      },
+      marketTrends: { 
+        description: 'Relevant market trends this business should consider', 
+        type: 'list' 
+      }
+    };
+
+    return await this.extractDataWithAI(url, businessQuery, businessRules);
+  }
+
+  // User journey analysis
+  private async extractUserJourneyInsights(url: string): Promise<any> {
+    const userJourneyQuery = `Analyze the user journey on this website. Map out the typical user paths, 
+    identify friction points, conversion barriers, and opportunities to improve the user experience. 
+    Consider different user types and their goals.`;
+    
+    const userJourneyRules: AIExtractionRules = {
+      userTypes: { 
+        description: 'Different types of users who visit this website', 
+        type: 'list' 
+      },
+      primaryUserGoals: { 
+        description: 'Main goals users want to achieve on this website', 
+        type: 'list' 
+      },
+      userJourneySteps: { 
+        description: 'Typical steps users take to achieve their goals', 
+        type: 'list' 
+      },
+      frictionPoints: { 
+        description: 'Areas where users might get stuck or confused', 
+        type: 'list' 
+      },
+      conversionBarriers: { 
+        description: 'Obstacles preventing users from converting', 
+        type: 'list' 
+      },
+      userExperienceGaps: { 
+        description: 'Missing features or content that users expect', 
+        type: 'list' 
+      },
+      engagementOpportunities: { 
+        description: 'Ways to increase user engagement and retention', 
+        type: 'list' 
+      }
+    };
+
+    return await this.extractDataWithAI(url, userJourneyQuery, userJourneyRules);
+  }
+
+  // Conversion optimization analysis
+  private async extractConversionOptimization(url: string): Promise<any> {
+    const conversionQuery = `Analyze this website for conversion optimization opportunities. 
+    Evaluate call-to-actions, forms, checkout processes, trust signals, and other elements 
+    that impact conversion rates. Provide specific recommendations for improvement.`;
+    
+    const conversionRules: AIExtractionRules = {
+      primaryConversions: { 
+        description: 'Main conversion goals identified on the website', 
+        type: 'list' 
+      },
+      ctaEffectiveness: { 
+        description: 'Assessment of call-to-action buttons and messaging', 
+        type: 'string' 
+      },
+      trustSignals: { 
+        description: 'Trust elements present (testimonials, reviews, security badges)', 
+        type: 'list' 
+      },
+      formOptimization: { 
+        description: 'Analysis of forms and checkout processes', 
+        type: 'string' 
+      },
+      urgencyTactics: { 
+        description: 'Urgency or scarcity tactics used to drive conversions', 
+        type: 'list' 
+      },
+      socialProof: { 
+        description: 'Social proof elements that could improve conversions', 
+        type: 'list' 
+      },
+      conversionKillers: { 
+        description: 'Elements that might be hurting conversion rates', 
+        type: 'list' 
+      },
+      abtestOpportunities: { 
+        description: 'Specific elements that should be A/B tested', 
+        type: 'list' 
+      }
+    };
+
+    return await this.extractDataWithAI(url, conversionQuery, conversionRules);
+  }
+
+  // Accessibility assessment
+  private async extractAccessibilityAssessment(url: string): Promise<any> {
+    const accessibilityQuery = `Analyze this website for accessibility compliance and inclusive design. 
+    Check for WCAG guidelines adherence, keyboard navigation, screen reader compatibility, 
+    color contrast, and other accessibility factors.`;
+    
+    const accessibilityRules: AIExtractionRules = {
+      wcagCompliance: { 
+        description: 'WCAG compliance level assessment (A, AA, AAA)', 
+        type: 'string' 
+      },
+      colorContrastIssues: { 
+        description: 'Color contrast problems identified', 
+        type: 'list' 
+      },
+      keyboardNavigation: { 
+        description: 'Keyboard navigation accessibility assessment', 
+        type: 'string' 
+      },
+      screenReaderFriendly: { 
+        description: 'Screen reader compatibility analysis', 
+        type: 'string' 
+      },
+      altTextCoverage: { 
+        description: 'Image alt text coverage and quality', 
+        type: 'string' 
+      },
+      formAccessibility: { 
+        description: 'Form accessibility for users with disabilities', 
+        type: 'string' 
+      },
+      accessibilityFixes: { 
+        description: 'Priority accessibility improvements needed', 
+        type: 'list' 
+      },
+      inclusiveDesignScore: { 
+        description: 'Overall inclusive design assessment (1-10)', 
+        type: 'number' 
+      }
+    };
+
+    return await this.extractDataWithAI(url, accessibilityQuery, accessibilityRules);
+  }
+
+  // Smart content analysis with sentiment and emotion detection
+  async extractEmotionalContentAnalysis(url: string): Promise<any> {
+    const emotionalQuery = `Analyze the emotional tone and psychological impact of this website's content. 
+    Assess how the content makes users feel, identify emotional triggers, and evaluate the overall 
+    brand personality conveyed through the content.`;
+    
+    const emotionalRules: AIExtractionRules = {
+      emotionalTone: { 
+        description: 'Overall emotional tone of the website (positive, negative, neutral)', 
+        type: 'string' 
+      },
+      brandPersonality: { 
+        description: 'Brand personality traits conveyed through content', 
+        type: 'list' 
+      },
+      emotionalTriggers: { 
+        description: 'Content elements that evoke strong emotions', 
+        type: 'list' 
+      },
+      trustFactors: { 
+        description: 'Elements that build trust and credibility', 
+        type: 'list' 
+      },
+      anxietyFactors: { 
+        description: 'Content that might create user anxiety or uncertainty', 
+        type: 'list' 
+      },
+      motivationalElements: { 
+        description: 'Content that motivates users to take action', 
+        type: 'list' 
+      },
+      sentimentScore: { 
+        description: 'Overall sentiment score (1-10, where 10 is most positive)', 
+        type: 'number' 
+      }
+    };
+
+    try {
+      return await this.extractDataWithAI(url, emotionalQuery, emotionalRules);
+    } catch (error) {
+      console.warn('Emotional content analysis failed:', error);
+      return null;
+    }
+  }
+
+  // Enhanced comprehensive analysis with AI insights
+  async comprehensiveAnalysisWithAI(url: string): Promise<ComprehensiveAnalysis> {
     const startTime = Date.now();
     
     try {
-      // Parallel execution for better performance
-      const [screenshot, content, aiData] = await Promise.all([
+      // Parallel execution for better performance - including AI insights
+      const [screenshot, content, seoInsights, contentInsights, technicalInsights] = await Promise.all([
         this.takeScreenshot(url, { 
           screenshot_full_page: true, 
           render_js: true,
@@ -285,29 +738,43 @@ export class ScrapingBeeService {
           render_js: true, 
           wait: 5000 
         }),
-        this.extractDataWithAI(url, 
-          'Extract comprehensive website information including SEO data, content analysis, and technical details',
-          {
-            title: { description: 'main page title', type: 'string' },
-            description: { description: 'meta description', type: 'string' },
-            keywords: { description: 'main keywords found on the page', type: 'list' },
-            headings: { description: 'all heading elements', type: 'list' },
-            images: { description: 'all images with their alt text', type: 'list' },
-            links: { description: 'all links (internal and external)', type: 'list' },
-            contentSummary: { description: 'summary of main content', type: 'string' },
-            language: { description: 'detected language of the content', type: 'string' },
-            socialMediaLinks: { description: 'social media links found', type: 'list' },
-            contactInfo: { description: 'contact information found', type: 'list' },
-            technicalIssues: { description: 'any technical issues detected', type: 'list' }
-          }
-        ).catch(error => {
-          console.warn('AI extraction failed, continuing with basic analysis:', error);
-          return null;
-        })
+        this.extractSEOInsights(url),
+        this.extractContentInsights(url),
+        this.extractTechnicalInsights(url)
       ]);
 
       const loadTime = Date.now() - startTime;
-      const analysis = this.analyzeHTML(content.html || '');
+      const basicAnalysis = this.analyzeHTML(content.html || '');
+      
+      // Enhanced analysis with AI insights
+      const enhancedAnalysis = {
+        ...basicAnalysis,
+        seo: {
+          ...basicAnalysis.seo,
+          ...(seoInsights && {
+            aiOptimization: seoInsights.titleOptimization,
+            keywordStrategy: seoInsights.keywordStrategy,
+            contentGaps: seoInsights.contentGaps,
+            technicalIssues: seoInsights.technicalSEOIssues
+          })
+        },
+        content: {
+          ...basicAnalysis.content,
+          ...(contentInsights && {
+            qualityScore: contentInsights.contentQualityScore,
+            engagementFactors: contentInsights.userEngagementFactors,
+            ctaAnalysis: contentInsights.callToActionAnalysis,
+            toneAnalysis: contentInsights.toneAndMessaging
+          })
+        },
+        technical: {
+          ...(technicalInsights && {
+            stack: technicalInsights.technicalStack,
+            issues: technicalInsights.performanceIssues,
+            optimizations: technicalInsights.optimizationRecommendations
+          })
+        }
+      };
       
       return {
         screenshot,
@@ -316,33 +783,28 @@ export class ScrapingBeeService {
           performance: {
             loadTime,
             pageSize: new Blob([content.html || '']).size,
-            ...analysis.performance
+            ...enhancedAnalysis.performance
           },
-          seo: {
-            ...analysis.seo,
-            ...(aiData?.title && { title: aiData.title }),
-            ...(aiData?.description && { description: aiData.description }),
-            ...(aiData?.keywords && { keywords: aiData.keywords })
-          },
-          accessibility: analysis.accessibility,
-          security: analysis.security,
-          mobile: analysis.mobile,
-          content: {
-            ...analysis.content,
-            ...(aiData?.language && { language: aiData.language })
-          }
+          seo: enhancedAnalysis.seo,
+          accessibility: enhancedAnalysis.accessibility,
+          security: enhancedAnalysis.security,
+          mobile: enhancedAnalysis.mobile,
+          content: enhancedAnalysis.content
         },
-        ...(aiData && {
-          aiInsights: {
-            contentSummary: aiData.contentSummary || 'AI analysis not available',
-            recommendations: this.generateRecommendations(analysis),
-            ...(aiData.technicalIssues && { technicalIssues: aiData.technicalIssues })
-          }
-        })
+        aiInsights: {
+          contentSummary: contentInsights?.readabilityAssessment || 'AI analysis not available',
+          recommendations: [
+            ...(seoInsights?.technicalSEOIssues || []),
+            ...(contentInsights?.userEngagementFactors || []),
+            ...(technicalInsights?.optimizationRecommendations || [])
+          ].slice(0, 10), // Limit to top 10 recommendations
+          competitorAnalysis: undefined, // Would need competitor data
+          sentimentAnalysis: undefined // Would need sentiment analysis data
+        }
       };
     } catch (error) {
-      console.error('Comprehensive analysis error:', error);
-      throw new Error(`Failed to perform comprehensive analysis: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Comprehensive AI analysis error:', error);
+      throw new Error(`Failed to perform comprehensive AI analysis: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -547,7 +1009,7 @@ export class ScrapingBeeService {
     };
   }> {
     try {
-      const analysis = await this.comprehensiveAnalysis(url);
+      const analysis = await this.comprehensiveAnalysisWithAI(url);
       return {
         screenshot: analysis.screenshot,
         html: analysis.html,

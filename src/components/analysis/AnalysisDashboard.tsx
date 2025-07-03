@@ -11,7 +11,8 @@ import {
   Share2,
   Filter,
   Search,
-  RefreshCw
+  RefreshCw,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -25,7 +26,7 @@ import { TrafficAnalysis } from './TrafficAnalysis';
 interface AnalysisDashboardProps {
   analyses: WebsiteAnalysis[];
   onRefresh: () => void;
-  onExport: (format: string) => void;
+  onExport: (format: 'pdf' | 'csv' | 'json') => void;
 }
 
 export function AnalysisDashboard({ analyses, onRefresh, onExport }: AnalysisDashboardProps) {
@@ -33,6 +34,7 @@ export function AnalysisDashboard({ analyses, onRefresh, onExport }: AnalysisDas
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [activeTab, setActiveTab] = useState('overview');
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
 
   useEffect(() => {
     if (analyses.length > 0 && !selectedAnalysis) {
@@ -76,10 +78,61 @@ export function AnalysisDashboard({ analyses, onRefresh, onExport }: AnalysisDas
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
-          <Button variant="outline" onClick={() => onExport('pdf')} className="flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Export
-          </Button>
+          
+          {/* Export Dropdown */}
+          <div className="relative">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowExportDropdown(!showExportDropdown)}
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+            
+            {showExportDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10"
+              >
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      onExport('pdf');
+                      setShowExportDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    PDF Report
+                  </button>
+                  <button
+                    onClick={() => {
+                      onExport('csv');
+                      setShowExportDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    CSV Data
+                  </button>
+                  <button
+                    onClick={() => {
+                      onExport('json');
+                      setShowExportDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <Globe className="w-4 h-4" />
+                    JSON Export
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </div>
+          
           <Button variant="outline" className="flex items-center gap-2">
             <Share2 className="w-4 h-4" />
             Share
@@ -245,8 +298,11 @@ export function AnalysisDashboard({ analyses, onRefresh, onExport }: AnalysisDas
                 )}
                 {activeTab === 'competitors' && (
                   <CompetitorComparison 
-                    currentSite={selectedAnalysis}
-                    competitors={[]} // Would be populated with competitor data
+                    primaryWebsite={{
+                      url: selectedAnalysis.url,
+                      name: selectedAnalysis.name,
+                      metrics: selectedAnalysis.metrics
+                    }}
                   />
                 )}
                 {/* Add other tab content components as needed */}
