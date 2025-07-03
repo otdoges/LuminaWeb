@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { authGuard } from '../middleware/authGuard';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 
 interface AuthState {
@@ -39,8 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       setIsLoading(false);
 
-      // Handle user profile creation for new users
-      if (event === 'SIGNED_IN' && session?.user && !session.user.user_metadata?.name) {
+      // Handle successful sign in - redirect to intended page
+      if (event === 'SIGNED_IN' && session?.user) {
         // Create user profile in database if it doesn't exist
         try {
           const { error } = await supabase
@@ -48,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .upsert({
               id: session.user.id,
               email: session.user.email!,
-              name: session.user.user_metadata?.full_name || session.user.email!.split('@')[0],
+              name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email!.split('@')[0],
               avatar_url: session.user.user_metadata?.avatar_url,
             }, { onConflict: 'id' });
 
@@ -57,6 +58,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } catch (error) {
           console.error('Error in user profile creation:', error);
+        }
+
+        // Don't auto-redirect here - let the auth guard handle it to avoid conflicts
+        console.log('User signed in successfully');
+      }
+
+      // Handle sign out - redirect if on protected route
+      if (event === 'SIGNED_OUT') {
+        const pathname = window.location.pathname;
+        if (authGuard.isProtectedRoute(pathname)) {
+          setTimeout(() => {
+            window.location.href = '/auth';
+          }, 100);
         }
       }
     });

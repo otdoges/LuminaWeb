@@ -9,10 +9,10 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-primary-900 dark:via-primary-800 dark:to-primary-900">
-      <div className="min-h-screen flex">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-primary-900 dark:via-primary-800 dark:to-primary-900 zen-browser-optimized">
+      <div className="min-h-screen flex flex-col xl:flex-row zen-auth-layout">
         {/* Left side - Branding */}
-        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <div className="hidden xl:flex xl:flex-1 xl:min-w-0 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-accent-600 to-accent-800"></div>
           <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.1%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
           
@@ -50,9 +50,9 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
         </div>
 
         {/* Right side - Auth Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full xl:flex-1 xl:min-w-0 flex items-center justify-center p-4 sm:p-8">
           <div className="w-full max-w-md">
-            <div className="text-center mb-8 lg:hidden">
+            <div className="text-center mb-8 xl:hidden">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <div className="p-2 bg-accent-100 rounded-lg">
                   <Monitor className="w-6 h-6 text-accent-600" />

@@ -18,7 +18,7 @@ function AppContent() {
   }
 
   // Show landing page if not authenticated and landing is enabled
-  if (!isAuthenticated && showLanding) {
+  if (!isAuthenticated && showLanding && window.location.pathname === '/') {
     return <LandingPage onGetStarted={() => setShowLanding(false)} />;
   }
 

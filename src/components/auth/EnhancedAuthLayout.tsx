@@ -21,13 +21,13 @@ export function EnhancedAuthLayout({ children, title, subtitle }: EnhancedAuthLa
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-primary-900 dark:via-primary-800 dark:to-primary-900 overflow-hidden theme-transition">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-primary-900 dark:via-primary-800 dark:to-primary-900 overflow-hidden theme-transition zen-browser-optimized">
       {/* Theme Switcher */}
       <div className="absolute top-4 right-4 z-50">
         <ThemeSwitcher />
       </div>
 
-      <div className="min-h-screen flex relative">
+      <div className="min-h-screen flex flex-col xl:flex-row relative zen-auth-layout">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(15)].map((_, i) => (
@@ -53,7 +53,7 @@ export function EnhancedAuthLayout({ children, title, subtitle }: EnhancedAuthLa
         </div>
 
         {/* Left side - Enhanced Branding */}
-        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <div className="hidden xl:flex xl:flex-1 xl:min-w-0 relative overflow-hidden">
           <div 
             className="absolute inset-0"
             style={{ 
@@ -182,9 +182,9 @@ export function EnhancedAuthLayout({ children, title, subtitle }: EnhancedAuthLa
         </div>
 
         {/* Right side - Enhanced Auth Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative">
+        <div className="w-full xl:flex-1 xl:min-w-0 flex items-center justify-center p-4 sm:p-8 relative">
           <div className="w-full max-w-md relative z-10">
-            <div className="text-center mb-8 lg:hidden">
+            <div className="text-center mb-8 xl:hidden">
               <motion.div 
                 className="flex items-center justify-center gap-2 mb-4"
                 initial={{ opacity: 0, scale: 0.8 }}
