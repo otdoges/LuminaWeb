@@ -1,4 +1,5 @@
 export interface WebsiteAnalysis {
+  timestamp: any;
   id: string;
   url: string;
   name: string;

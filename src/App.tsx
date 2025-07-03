@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { NotificationProvider, NotificationContainer } from './components/ui/notification';
 import { LandingPage } from './pages/LandingPage';
 import { EnhancedAuthPage } from './pages/EnhancedAuthPage';
 import { Dashboard } from './pages/Dashboard';
 import { AnalysisPage } from './pages/AnalysisPage';
 import { ChatPage } from './pages/ChatPage';
 import { LoadingOverlay } from './components/ui/LoadingSpinner';
+import { UIShowcase } from './components/demo/UIShowcase';
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -38,11 +40,16 @@ function AppContent() {
           element={isAuthenticated ? <ChatPage /> : <Navigate to="/auth" replace />} 
         />
         <Route 
+          path="/demo" 
+          element={isAuthenticated ? <UIShowcase /> : <Navigate to="/auth" replace />} 
+        />
+        <Route 
           path="/" 
           element={isAuthenticated ? <Dashboard /> : <Navigate to="/auth" replace />} 
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <NotificationContainer />
     </Router>
   );
 }
@@ -51,7 +58,9 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppContent />
+        <NotificationProvider>
+          <AppContent />
+        </NotificationProvider>
       </AuthProvider>
     </ThemeProvider>
   );
