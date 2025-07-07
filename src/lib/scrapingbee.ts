@@ -1,4 +1,6 @@
 import { rateLimiter } from './rateLimiter';
+import { apiSecurity, ValidationRules } from './apiSecurity';
+import { cache, CacheStrategies } from './cachingLayer';
 
 interface ScrapingBeeOptions {
   url: string;
@@ -103,6 +105,13 @@ export class ScrapingBeeService {
     this.maxRetries = 3;
     this.isConfigured = Boolean(this.apiKey);
     
+    // Initialize security system
+    if (this.apiKey) {
+      apiSecurity.storeAPIKey('scrapingbee', this.apiKey, {
+        rotationInterval: 30, // Rotate every 30 days
+      });
+    }
+    
     if (!this.isConfigured) {
       console.warn('ScrapingBee API key not found. Service will return mock data. Please set VITE_SCRAPINGBEE_API_KEY in your environment variables.');
     }
@@ -174,22 +183,36 @@ export class ScrapingBeeService {
   async takeScreenshot(url: string, options: Partial<ScrapingBeeOptions> = {}): Promise<string> {
     this.checkConfiguration();
     
-    const params = new URLSearchParams({
-      api_key: this.apiKey!,
-      url: url,
-      screenshot: 'true',
-      screenshot_full_page: options.screenshot_full_page ? 'true' : 'false',
-      window_width: (options.window_width || 1920).toString(),
-      window_height: (options.window_height || 1080).toString(),
-      wait: (options.wait || 3000).toString(),
-      render_js: options.render_js !== false ? 'true' : 'false',
-      ...(options.wait_for && { wait_for: options.wait_for }),
-      ...(options.device && { device: options.device }),
-      ...(options.premium_proxy && { premium_proxy: 'true' }),
-      ...(options.country_code && { country_code: options.country_code })
-    });
+    // Validate request with security system
+    const validationRules = [
+      ValidationRules.URL,
+      { field: 'window_width', type: 'number', required: false },
+      { field: 'window_height', type: 'number', required: false },
+      { field: 'wait', type: 'number', required: false },
+      { field: 'device', type: 'string', required: false, allowedValues: ['desktop', 'mobile', 'tablet'] }
+    ];
+    
+    const requestData = { url, ...options };
+    
+    return apiSecurity.executeSecureRequest(
+      'scrapingbee',
+      async () => {
+        const params = new URLSearchParams({
+          api_key: this.apiKey!,
+          url: url,
+          screenshot: 'true',
+          screenshot_full_page: options.screenshot_full_page ? 'true' : 'false',
+          window_width: (options.window_width || 1920).toString(),
+          window_height: (options.window_height || 1080).toString(),
+          wait: (options.wait || 3000).toString(),
+          render_js: options.render_js !== false ? 'true' : 'false',
+          ...(options.wait_for && { wait_for: options.wait_for }),
+          ...(options.device && { device: options.device }),
+          ...(options.premium_proxy && { premium_proxy: 'true' }),
+          ...(options.country_code && { country_code: options.country_code })
+        });
 
-    return this.retryRequest(async () => {
+        return this.retryRequest(async () => {
       try {
         const response = await this.makeRequest(`${this.baseUrl}?${params}`, {
           method: 'GET',
@@ -212,11 +235,16 @@ export class ScrapingBeeService {
         throw new Error(`Failed to capture screenshot: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }, 'screenshot');
+      },
+      requestData,
+      validationRules
+    );
   }
 
   async scrapeContent(url: string, options: Partial<ScrapingBeeOptions> = {}): Promise<ScrapingBeeResponse> {
     this.checkConfiguration();
-    
+
+    // Build params with all supported options, including device and window size if present
     const params = new URLSearchParams({
       api_key: this.apiKey!,
       url: url,
@@ -224,7 +252,10 @@ export class ScrapingBeeService {
       wait: (options.wait || 3000).toString(),
       ...(options.wait_for && { wait_for: options.wait_for }),
       ...(options.premium_proxy && { premium_proxy: 'true' }),
-      ...(options.country_code && { country_code: options.country_code })
+      ...(options.country_code && { country_code: options.country_code }),
+      ...(options.device && { device: options.device }),
+      ...(options.window_width && { window_width: options.window_width.toString() }),
+      ...(options.window_height && { window_height: options.window_height.toString() }),
     });
 
     return this.retryRequest(async () => {
@@ -241,8 +272,16 @@ export class ScrapingBeeService {
           throw new Error(`ScrapingBee API error: ${response.status} ${response.statusText} - ${errorText}`);
         }
 
-        const html = await response.text();
-        
+        // Try to parse as JSON, fallback to text if not JSON
+        let html: string;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          html = typeof data === 'string' ? data : (data.html || '');
+        } else {
+          html = await response.text();
+        }
+
         return {
           html,
           url,
@@ -262,7 +301,7 @@ export class ScrapingBeeService {
     options: Partial<ScrapingBeeOptions> = {}
   ): Promise<any> {
     this.checkConfiguration();
-    
+
     const params = new URLSearchParams({
       api_key: this.apiKey!,
       url: url,
@@ -272,7 +311,10 @@ export class ScrapingBeeService {
       ...(extractRules && { ai_extract_rules: JSON.stringify(extractRules) }),
       ...(options.wait_for && { wait_for: options.wait_for }),
       ...(options.premium_proxy && { premium_proxy: 'true' }),
-      ...(options.country_code && { country_code: options.country_code })
+      ...(options.country_code && { country_code: options.country_code }),
+      ...(options.device && { device: options.device }),
+      ...(options.window_width && { window_width: options.window_width.toString() }),
+      ...(options.window_height && { window_height: options.window_height.toString() }),
     });
 
     return this.retryRequest(async () => {
@@ -303,7 +345,7 @@ export class ScrapingBeeService {
     const seoQuery = `Analyze this website's SEO performance and identify specific optimization opportunities. 
     Focus on title tags, meta descriptions, heading structure, keyword usage, internal linking, 
     and content optimization. Provide actionable recommendations.`;
-    
+
     const seoRules: AIExtractionRules = {
       titleOptimization: { 
         description: 'Analysis of title tag optimization and recommendations', 
@@ -348,7 +390,7 @@ export class ScrapingBeeService {
     const contentQuery = `Analyze this website's content quality, readability, user engagement potential, 
     and provide specific recommendations for improvement. Focus on content structure, messaging clarity, 
     call-to-actions, and user experience.`;
-    
+
     const contentRules: AIExtractionRules = {
       contentQualityScore: { 
         description: 'Overall content quality assessment (1-10)', 
@@ -397,7 +439,7 @@ export class ScrapingBeeService {
     const competitiveQuery = `Analyze this website and identify what type of business/industry it serves. 
     Based on the content, design, and features, suggest what competitive advantages or disadvantages 
     it might have compared to similar websites in its industry.`;
-    
+
     const competitiveRules: AIExtractionRules = {
       industryType: { 
         description: 'Primary industry or business type this website serves', 
@@ -442,7 +484,7 @@ export class ScrapingBeeService {
     const technicalQuery = `Analyze this website's technical implementation, performance indicators, 
     and identify technical issues or optimization opportunities. Focus on code quality, loading speed, 
     mobile optimization, and accessibility.`;
-    
+
     const technicalRules: AIExtractionRules = {
       technicalStack: { 
         description: 'Technologies and frameworks detected on the website', 
@@ -514,7 +556,7 @@ export class ScrapingBeeService {
     const businessQuery = `Analyze this website as a business intelligence analyst would. Identify the business model, 
     revenue streams, target market, competitive positioning, and growth opportunities. Also assess the digital maturity 
     and online presence effectiveness.`;
-    
+
     const businessRules: AIExtractionRules = {
       businessModel: { 
         description: 'Primary business model (B2B, B2C, marketplace, SaaS, etc.)', 
@@ -554,7 +596,7 @@ export class ScrapingBeeService {
     const userJourneyQuery = `Analyze the user journey on this website. Map out the typical user paths, 
     identify friction points, conversion barriers, and opportunities to improve the user experience. 
     Consider different user types and their goals.`;
-    
+
     const userJourneyRules: AIExtractionRules = {
       userTypes: { 
         description: 'Different types of users who visit this website', 
@@ -594,7 +636,7 @@ export class ScrapingBeeService {
     const conversionQuery = `Analyze this website for conversion optimization opportunities. 
     Evaluate call-to-actions, forms, checkout processes, trust signals, and other elements 
     that impact conversion rates. Provide specific recommendations for improvement.`;
-    
+
     const conversionRules: AIExtractionRules = {
       primaryConversions: { 
         description: 'Main conversion goals identified on the website', 
@@ -638,7 +680,7 @@ export class ScrapingBeeService {
     const accessibilityQuery = `Analyze this website for accessibility compliance and inclusive design. 
     Check for WCAG guidelines adherence, keyboard navigation, screen reader compatibility, 
     color contrast, and other accessibility factors.`;
-    
+
     const accessibilityRules: AIExtractionRules = {
       wcagCompliance: { 
         description: 'WCAG compliance level assessment (A, AA, AAA)', 
@@ -682,7 +724,7 @@ export class ScrapingBeeService {
     const emotionalQuery = `Analyze the emotional tone and psychological impact of this website's content. 
     Assess how the content makes users feel, identify emotional triggers, and evaluate the overall 
     brand personality conveyed through the content.`;
-    
+
     const emotionalRules: AIExtractionRules = {
       emotionalTone: { 
         description: 'Overall emotional tone of the website (positive, negative, neutral)', 
@@ -725,7 +767,7 @@ export class ScrapingBeeService {
   // Enhanced comprehensive analysis with AI insights
   async comprehensiveAnalysisWithAI(url: string): Promise<ComprehensiveAnalysis> {
     const startTime = Date.now();
-    
+
     try {
       // Parallel execution for better performance - including AI insights
       const [screenshot, content, seoInsights, contentInsights, technicalInsights] = await Promise.all([
@@ -745,7 +787,7 @@ export class ScrapingBeeService {
 
       const loadTime = Date.now() - startTime;
       const basicAnalysis = this.analyzeHTML(content.html || '');
-      
+
       // Enhanced analysis with AI insights
       const enhancedAnalysis = {
         ...basicAnalysis,
@@ -775,7 +817,7 @@ export class ScrapingBeeService {
           })
         }
       };
-      
+
       return {
         screenshot,
         html: content.html || '',
@@ -812,12 +854,12 @@ export class ScrapingBeeService {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      
+
       // SEO Analysis
       const title = doc.querySelector('title')?.textContent || '';
       const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
       const keywords = doc.querySelector('meta[name="keywords"]')?.getAttribute('content')?.split(',').map(k => k.trim()) || [];
-      
+
       const headings = {
         h1: doc.querySelectorAll('h1').length,
         h2: doc.querySelectorAll('h2').length,
@@ -829,11 +871,20 @@ export class ScrapingBeeService {
 
       const images = doc.querySelectorAll('img');
       const links = doc.querySelectorAll('a');
+      // Use try/catch for window access in non-browser environments
+      let hostname = '';
+      let protocol = '';
+      try {
+        hostname = window.location.hostname;
+        protocol = window.location.protocol;
+      } catch {
+        // Not in browser, leave as empty string
+      }
       const internalLinks = Array.from(links).filter(link => 
-        !link.href.startsWith('http') || link.href.includes(window.location.hostname)
+        !link.href.startsWith('http') || (hostname && link.href.includes(hostname))
       );
       const externalLinks = Array.from(links).filter(link => 
-        link.href.startsWith('http') && !link.href.includes(window.location.hostname)
+        link.href.startsWith('http') && (!hostname || !link.href.includes(hostname))
       );
 
       // Accessibility Analysis
@@ -842,7 +893,7 @@ export class ScrapingBeeService {
 
       // Security Analysis
       const securityHeaders = {
-        httpsEnabled: window.location.protocol === 'https:',
+        httpsEnabled: protocol === 'https:',
         securityHeaders: [], // Would need server-side analysis
         vulnerabilities: []
       };
@@ -850,7 +901,7 @@ export class ScrapingBeeService {
       // Content Analysis
       const textContent = doc.body?.textContent || '';
       const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
-      
+
       return {
         performance: {
           firstContentfulPaint: 1.2 + Math.random() * 2,
