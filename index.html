@@ -2,12 +2,76 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LuminaWeb - Website Optimization Tool</title>
+    
+    <!-- Performance & Preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://api.groq.com" crossorigin>
+    <link rel="dns-prefetch" href="https://supabase.co">
+    
+    <!-- Critical Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="LuminaWeb - Advanced website optimization tool with AI-powered insights, real-time analytics, performance monitoring, and comprehensive SEO analysis for developers and businesses." />
+    <meta name="keywords" content="website optimization, performance analysis, SEO tools, web analytics, lighthouse audit, page speed, core web vitals, ai insights" />
+    <meta name="author" content="LuminaWeb" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#3b82f6" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="LuminaWeb - Website Optimization Tool" />
+    <meta property="og:description" content="Get comprehensive insights, performance metrics, and AI-powered optimization recommendations for your websites. Real-time analytics and professional auditing tools." />
+    <meta property="og:url" content="https://luminaweb.app" />
+    <meta property="og:site_name" content="LuminaWeb" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:alt" content="LuminaWeb Dashboard - Website Optimization Platform" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LuminaWeb - Website Optimization Tool" />
+    <meta name="twitter:description" content="AI-powered website optimization with real-time analytics and performance insights." />
+    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:site" content="@luminaweb" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "LuminaWeb",
+      "description": "Advanced website optimization tool with AI-powered insights and real-time analytics",
+      "url": "https://luminaweb.app",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "LuminaWeb"
+      }
+    }
+    </script>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Page Title -->
+    <title>LuminaWeb - Website Optimization Tool</title>
+    
+    <!-- Critical CSS (font loading) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Preload critical resources -->
+    <link rel="modulepreload" href="/src/main.tsx" />
   </head>
   <body class="font-inter">
     <div id="root"></div>

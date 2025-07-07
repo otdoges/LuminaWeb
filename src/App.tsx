@@ -10,6 +10,7 @@ import { AnalysisPage } from './pages/AnalysisPage';
 import { ChatPage } from './pages/ChatPage';
 import { LoadingOverlay } from './components/ui/LoadingSpinner';
 import { UIShowcase } from './components/demo/UIShowcase';
+import { MotionPlayground } from './pages/MotionPlayground';
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -42,6 +43,10 @@ function AppContent() {
         <Route 
           path="/demo" 
           element={isAuthenticated ? <UIShowcase /> : <Navigate to="/auth" replace />} 
+        />
+        <Route 
+          path="/playground" 
+          element={isAuthenticated ? <MotionPlayground /> : <Navigate to="/auth" replace />} 
         />
         <Route 
           path="/" 

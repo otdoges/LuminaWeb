@@ -63,6 +63,19 @@ export default {
         inter: ['Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
+        // Fast animations (150ms)
+        'fast': 'fadeIn 0.15s ease-out',
+        'slide-up-fast': 'slideUp 0.15s ease-out',
+        'slide-down-fast': 'slideDown 0.15s ease-out',
+        'scale-in-fast': 'scaleIn 0.15s ease-out',
+        
+        // Slow animations (500ms)
+        'slow': 'fadeIn 0.5s ease-in-out',
+        'slide-up-slow': 'slideUp 0.5s ease-in-out',
+        'slide-down-slow': 'slideDown 0.5s ease-in-out',
+        'scale-in-slow': 'scaleIn 0.5s ease-in-out',
+        
+        // Original animations
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
         'slide-down': 'slideDown 0.3s ease-out',

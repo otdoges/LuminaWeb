@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, !!session);
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
@@ -49,7 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .upsert({
               id: session.user.id,
               email: session.user.email!,
-              name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email!.split('@')[0],
+              name: session.user.user_metadata?.full_name || 
+                    session.user.user_metadata?.name || 
+                    session.user.user_metadata?.user_name ||
+                    session.user.email!.split('@')[0],
               avatar_url: session.user.user_metadata?.avatar_url,
             }, { onConflict: 'id' });
 
@@ -60,8 +64,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error('Error in user profile creation:', error);
         }
 
-        // Don't auto-redirect here - let the auth guard handle it to avoid conflicts
-        console.log('User signed in successfully');
+        // Redirect to dashboard after successful authentication
+        if (window.location.pathname === '/auth') {
+          window.location.href = '/';
+        }
       }
 
       // Handle sign out - redirect if on protected route
@@ -72,6 +78,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             window.location.href = '/auth';
           }, 100);
         }
+      }
+
+      // Handle token refresh errors
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed successfully');
       }
     });
 
@@ -117,15 +128,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGitHub = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      // Get the current URL for better redirect handling
+      const currentUrl = window.location.origin;
+      const redirectTo = `${currentUrl}/`;
+      
+      console.log('Initiating GitHub OAuth with redirect:', redirectTo);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: redirectTo,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
-      if (error) throw error;
+
+      if (error) {
+        console.error('GitHub OAuth error:', error);
+        throw error;
+      }
+
+      console.log('GitHub OAuth initiated successfully:', data);
+      
+      // Note: The redirect will happen automatically, so we don't need to do anything else here
     } catch (error) {
-      throw new Error((error as AuthError).message || 'GitHub sign in failed');
+      console.error('GitHub sign in error:', error);
+      throw new Error((error as AuthError).message || 'GitHub sign in failed. Please check your internet connection and try again.');
     } finally {
       setIsLoading(false);
     }
