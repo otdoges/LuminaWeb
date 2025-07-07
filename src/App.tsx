@@ -11,6 +11,7 @@ import { ChatPage } from './pages/ChatPage';
 import { LoadingOverlay } from './components/ui/LoadingSpinner';
 import { UIShowcase } from './components/demo/UIShowcase';
 import { MotionPlayground } from './pages/MotionPlayground';
+import { EnvDebug } from './components/debug/EnvDebug';
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -55,6 +56,7 @@ function AppContent() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <NotificationContainer />
+      <EnvDebug />
     </Router>
   );
 }

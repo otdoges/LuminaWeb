@@ -4,8 +4,35 @@ import { Database } from '../types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Debug environment variables (only in development)
+if (import.meta.env.DEV) {
+  console.log('🔧 Environment Variables Debug:');
+  console.log('VITE_SUPABASE_URL:', supabaseUrl ? 'Set ✅' : 'Missing ❌');
+  console.log('VITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Set ✅' : 'Missing ❌');
+  
+  if (!supabaseUrl) {
+    console.error('❌ VITE_SUPABASE_URL is missing from environment variables');
+    console.log('📝 Please add VITE_SUPABASE_URL to your .env.local file');
+  }
+  
+  if (!supabaseAnonKey) {
+    console.error('❌ VITE_SUPABASE_ANON_KEY is missing from environment variables');
+    console.log('📝 Please add VITE_SUPABASE_ANON_KEY to your .env.local file');
+  }
+}
+
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  const errorMessage = `Missing Supabase environment variables:
+${!supabaseUrl ? '- VITE_SUPABASE_URL' : ''}
+${!supabaseAnonKey ? '- VITE_SUPABASE_ANON_KEY' : ''}
+
+Please create a .env.local file in your project root with:
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+Get these values from: https://app.supabase.com → Your Project → Settings → API`;
+  
+  throw new Error(errorMessage);
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
