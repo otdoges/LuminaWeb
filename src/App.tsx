@@ -17,6 +17,7 @@ function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const [showLanding, setShowLanding] = useState(true);
 
+  // Show loading overlay during initial auth check
   if (isLoading) {
     return <LoadingOverlay>Loading LuminaWeb...</LoadingOverlay>;
   }
