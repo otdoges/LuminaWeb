@@ -21,11 +21,6 @@ function AppContent() {
     return <LoadingOverlay>Loading LuminaWeb...</LoadingOverlay>;
   }
 
-  // Show landing page if not authenticated and landing is enabled
-  if (!isAuthenticated && showLanding && window.location.pathname === '/') {
-    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
-  }
-
   return (
     <Router>
       <Routes>
@@ -51,7 +46,15 @@ function AppContent() {
         />
         <Route 
           path="/" 
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/auth" replace />} 
+          element={
+            isAuthenticated ? (
+              <Dashboard />
+            ) : showLanding ? (
+              <LandingPage onGetStarted={() => setShowLanding(false)} />
+            ) : (
+              <Navigate to="/auth" replace />
+            )
+          } 
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

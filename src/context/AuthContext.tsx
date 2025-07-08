@@ -64,20 +64,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error('Error in user profile creation:', error);
         }
 
-        // Redirect to dashboard after successful authentication
-        if (window.location.pathname === '/auth') {
-          window.location.href = '/';
-        }
+        // Note: Navigation is now handled by React Router
       }
 
-      // Handle sign out - redirect if on protected route
+      // Handle sign out - navigation is now handled by React Router
       if (event === 'SIGNED_OUT') {
-        const pathname = window.location.pathname;
-        if (authGuard.isProtectedRoute(pathname)) {
-          setTimeout(() => {
-            window.location.href = '/auth';
-          }, 100);
-        }
+        // React Router will handle the redirect to auth automatically
+        console.log('User signed out, React Router will handle navigation');
       }
 
       // Handle token refresh errors
