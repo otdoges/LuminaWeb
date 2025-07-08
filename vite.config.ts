@@ -12,7 +12,7 @@ export default defineConfig({
     // PWA Configuration
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'favicon-16x16.png', 'favicon-32x32.png', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.svg'],
       manifest: {
         name: 'LuminaWeb - Website Optimization Tool',
         short_name: 'LuminaWeb',
@@ -163,14 +163,6 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
     exclude: ['lucide-react'],
-  },
-  
-  // CSS optimization
-  css: {
-    devSourcemap: false,
-    postcss: {
-      plugins: [],
-    },
   },
   
   // Define for environment variables

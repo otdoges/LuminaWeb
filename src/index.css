@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -75,7 +77,8 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-inter antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     scroll-behavior: smooth;
   }
   
@@ -203,7 +206,7 @@ button, a, [role="button"] {
 
 /* Focus styles for accessibility */
 .focus-visible:focus-visible {
-  @apply outline-2 outline-offset-2 outline-accent-500;
+  @apply outline-2 outline-offset-2 outline-accent;
 }
 
 /* Reduced motion for accessibility */
