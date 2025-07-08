@@ -30,7 +30,7 @@ Disallow: /wp-content/
 Disallow: /wp-includes/
 
 # Sitemap location (add this when you create a sitemap)
-# Sitemap: https://luminaweb.vercel.app/sitemap.xml
+# Sitemap: https://luminaweb.app/sitemap.xml
 
 # Crawl delay (optional - removes this comment if not needed)
 # Crawl-delay: 1 
