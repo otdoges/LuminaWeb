@@ -22,12 +22,26 @@ function AppContent() {
     return <LoadingOverlay>Loading LuminaWeb...</LoadingOverlay>;
   }
 
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      // User is authenticated, go to dashboard
+      setShowLanding(false);
+    } else {
+      // User is not authenticated, go to auth page
+      setShowLanding(false);
+    }
+  };
+
   return (
     <Router>
       <Routes>
         <Route 
           path="/auth" 
           element={isAuthenticated ? <Navigate to="/" replace /> : <EnhancedAuthPage />} 
+        />
+        <Route 
+          path="/dashboard" 
+          element={isAuthenticated ? <Dashboard /> : <Navigate to="/auth" replace />} 
         />
         <Route 
           path="/analysis" 
@@ -48,10 +62,10 @@ function AppContent() {
         <Route 
           path="/" 
           element={
-            isAuthenticated ? (
+            showLanding ? (
+              <LandingPage onGetStarted={handleGetStarted} />
+            ) : isAuthenticated ? (
               <Dashboard />
-            ) : showLanding ? (
-              <LandingPage onGetStarted={() => setShowLanding(false)} />
             ) : (
               <Navigate to="/auth" replace />
             )
