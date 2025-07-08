@@ -11,6 +11,7 @@ import { ChatPage } from './pages/ChatPage';
 import { LoadingOverlay } from './components/ui/LoadingSpinner';
 import { UIShowcase } from './components/demo/UIShowcase';
 import { MotionPlayground } from './pages/MotionPlayground';
+import { SettingsPage } from './pages/SettingsPage';
 import { EnvDebug } from './components/debug/EnvDebug';
 
 function AppContent() {
@@ -58,6 +59,10 @@ function AppContent() {
         <Route 
           path="/playground" 
           element={isAuthenticated ? <MotionPlayground /> : <Navigate to="/auth" replace />} 
+        />
+        <Route 
+          path="/settings" 
+          element={isAuthenticated ? <SettingsPage /> : <Navigate to="/auth" replace />} 
         />
         <Route 
           path="/" 

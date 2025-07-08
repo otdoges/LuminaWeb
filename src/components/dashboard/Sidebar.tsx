@@ -33,7 +33,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/analysis' },
     { id: 'chat', label: 'AI Chat', icon: MessageSquare, path: '/chat' },
     { id: 'demo', label: 'UI Showcase', icon: Palette, path: '/demo' },
-    { id: 'settings', label: 'Settings', icon: Settings, path: '/' },
+    { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
   ];
 
   const handleMenuClick = (item: typeof menuItems[0]) => {

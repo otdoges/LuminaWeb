@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, FileText, Clock, Download } from 'lucide-react';
+import { Plus, FileText, Clock, Download, ArrowLeft, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { LiquidGlass } from '../components/ui/LiquidGlass';
 import { AnalysisWizard } from '../components/analysis/AnalysisWizard';
 import { AnalysisDashboard } from '../components/analysis/AnalysisDashboard';
 import { WebsiteAnalysis, AnalysisSettings, AnalysisMetrics } from '../types/analysis';
@@ -15,6 +17,7 @@ import { BarChart3, LineChart, TrendingUp, Eye } from 'lucide-react';
 import { reportGenerator, ReportData, ReportOptions } from '../lib/reportGenerator';
 
 export function AnalysisPage() {
+  const navigate = useNavigate();
   const [showWizard, setShowWizard] = useState(false);
   const [analyses, setAnalyses] = useState<WebsiteAnalysis[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -555,6 +558,7 @@ export function AnalysisPage() {
         name: url.replace(/^https?:\/\//, '').replace(/^www\./, ''),
         status: 'analyzing' as const,
         createdAt: new Date(),
+        timestamp: Date.now(),
         metrics: {} as AnalysisMetrics, // Temporary empty metrics
         settings
       }));
@@ -744,6 +748,7 @@ export function AnalysisPage() {
       status: 'completed',
       createdAt: new Date(Date.now() - 86400000), // 1 day ago
       completedAt: new Date(Date.now() - 86000000), // Completed shortly after
+      timestamp: Date.now() - 86400000,
       metrics: {
         seo: {
           score: 85,
@@ -931,22 +936,44 @@ export function AnalysisPage() {
   return (
     <div className="min-h-screen bg-primary-50 dark:bg-primary-900 p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header with Back Button */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-primary-900 dark:text-primary-100">
-              Website Analysis
-            </h1>
-            <p className="text-primary-600 dark:text-primary-400">
-              Comprehensive website performance and optimization insights
-            </p>
+          <div className="flex items-center gap-4">
+            <LiquidGlass variant="button" hover className="p-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/')}
+                className="w-10 h-10 bg-transparent hover:bg-white/10"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </LiquidGlass>
+            
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">
+                Website Analysis
+              </h1>
+              <p className="text-muted-foreground">
+                Comprehensive website performance and optimization insights
+              </p>
+            </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={() => setShowWizard(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              New Analysis
-            </Button>
+            <LiquidGlass variant="button" hover>
+              <Button variant="ghost" onClick={() => navigate('/')} className="bg-transparent hover:bg-white/10">
+                <Home className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+            </LiquidGlass>
+            
+            <LiquidGlass variant="button" hover>
+              <Button onClick={() => setShowWizard(true)} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                <Plus className="w-4 h-4 mr-2" />
+                New Analysis
+              </Button>
+            </LiquidGlass>
           </div>
         </div>
 
