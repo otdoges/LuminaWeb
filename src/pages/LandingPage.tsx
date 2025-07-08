@@ -146,7 +146,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-primary-900 dark:via-primary-800 dark:to-primary-900 theme-transition">
       {/* Navigation */}
       <motion.nav 
-        className="fixed top-0 w-full z-50 bg-white/80 dark:bg-primary-900/80 backdrop-blur-md border-b border-primary-200 dark:border-primary-700 theme-transition"
+        className="fixed top-0 w-full z-50 bg-white/90 dark:bg-primary-900/90 backdrop-blur-lg border-b border-primary-200 dark:border-primary-700 theme-transition shadow-sm"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -159,19 +159,18 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
               transition={{ duration: 0.2 }}
             >
               <motion.div 
-                className="p-2 rounded-lg theme-transition"
-                style={{ backgroundColor: `${currentTheme.accent}20` }}
-                whileHover={{ rotate: 5 }}
+                className="p-2 rounded-lg bg-accent/10 theme-transition"
+                whileHover={{ rotate: 5, scale: 1.1 }}
                 transition={{ duration: 0.3 }}
               >
-                <Monitor className="w-6 h-6" style={{ color: currentTheme.accent }} />
+                <Monitor className="w-6 h-6 text-accent" />
               </motion.div>
-              <h1 className="text-xl font-bold text-primary-900 dark:text-primary-100 theme-transition">
+              <h1 className="text-xl font-bold text-foreground theme-transition">
                 LuminaWeb
               </h1>
             </motion.div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <ThemeSwitcher />
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -180,7 +179,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 <Button 
                   onClick={onGetStarted} 
                   className="group theme-transition"
-                  style={{ backgroundColor: currentTheme.accent }}
+                  size="sm"
                 >
                   Get Started
                   <motion.div
@@ -202,13 +201,12 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <AnimatedSection direction="up" delay={0.2}>
             <motion.h1 
-              className="text-5xl md:text-7xl font-bold text-primary-900 dark:text-primary-100 mb-6 leading-tight theme-transition"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight theme-transition tracking-tight"
             >
               Optimize Your Web
               <br />
               <motion.span 
-                className="theme-transition"
-                style={{ color: currentTheme.accent }}
+                className="text-accent theme-transition bg-gradient-to-r from-accent to-accent/80 bg-clip-text"
               >
                 Performance
               </motion.span>
@@ -223,16 +221,16 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           </AnimatedSection>
 
           <AnimatedSection direction="up" delay={0.6}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 max-w-md sm:max-w-none mx-auto">
               <motion.div
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
               >
                 <Button 
                   size="lg" 
                   onClick={onGetStarted} 
-                  className="group text-lg px-8 py-4 theme-transition relative overflow-hidden"
-                  style={{ backgroundColor: currentTheme.accent }}
+                  className="w-full sm:w-auto group relative overflow-hidden theme-transition"
                 >
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
@@ -253,12 +251,12 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
               <motion.div
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
               >
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="text-lg px-8 py-4 theme-transition"
-                  style={{ borderColor: currentTheme.accent, color: currentTheme.accent }}
+                  className="w-full sm:w-auto theme-transition"
                 >
                   Watch Demo
                 </Button>
