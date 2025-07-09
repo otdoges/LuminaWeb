@@ -1,5 +1,5 @@
-import React from 'react';
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -11,16 +11,17 @@ interface MetricsCardProps {
   color?: 'primary' | 'accent' | 'success' | 'warning' | 'error';
 }
 
-export function MetricsCard({ 
+export const MetricsCard = React.memo<MetricsCardProps>(({ 
   title, 
   value, 
   change, 
   icon: Icon, 
   color = 'primary' 
-}: MetricsCardProps) {
+}) => {
   const { currentTheme } = useTheme();
 
-  const getColorClasses = (color: string) => {
+  // Memoize color styles calculation to avoid recalculation on every render
+  const colorStyles = useMemo(() => {
     switch (color) {
       case 'accent':
         return {
@@ -48,31 +49,35 @@ export function MetricsCard({
           text: '#3B82F6'
         };
     }
-  };
+  }, [color, currentTheme.accent]);
 
-  const colorStyles = getColorClasses(color);
+  // Memoize change display to avoid recalculation
+  const changeDisplay = useMemo(() => {
+    if (change === undefined) return null;
+    
+    const isPositive = change >= 0;
+    return (
+      <p className={`text-sm mt-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+        {isPositive ? '+' : ''}{change}% from last month
+      </p>
+    );
+  }, [change]);
 
   return (
     <Card className="transition-all duration-200 hover:shadow-lg hover:-translate-y-1 theme-transition">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex-1 min-w-0">
             <p className="text-sm text-primary-600 dark:text-primary-400 mb-1 theme-transition">
               {title}
             </p>
-            <p className="text-2xl font-bold text-primary-900 dark:text-primary-100 theme-transition">
+            <p className="text-2xl font-bold text-primary-900 dark:text-primary-100 theme-transition truncate">
               {value}
             </p>
-            {change !== undefined && (
-              <p className={`text-sm mt-1 ${
-                change >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {change >= 0 ? '+' : ''}{change}% from last month
-              </p>
-            )}
+            {changeDisplay}
           </div>
           <div 
-            className="p-3 rounded-lg"
+            className="p-3 rounded-lg flex-shrink-0 ml-4"
             style={{ backgroundColor: colorStyles.bg }}
           >
             <Icon className="w-6 h-6" style={{ color: colorStyles.text }} />
@@ -81,4 +86,6 @@ export function MetricsCard({
       </CardContent>
     </Card>
   );
-}
+});
+
+MetricsCard.displayName = 'MetricsCard';

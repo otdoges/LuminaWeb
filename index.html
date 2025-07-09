@@ -16,19 +16,20 @@
     <meta name="author" content="LuminaWeb" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#3b82f6" />
+    <meta name="color-scheme" content="light dark" />
     
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
+    <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="LuminaWeb - Website Optimization Tool" />
-    <meta property="og:description" content="Get comprehensive insights, performance metrics, and AI-powered optimization recommendations for your websites. Real-time analytics and professional auditing tools." />
+    <meta property="og:description" content="AI-powered website optimization with real-time analytics and performance insights." />
+    <meta property="og:type" content="website" />
     <meta property="og:url" content="https://luminaweb.app" />
-    <meta property="og:site_name" content="LuminaWeb" />
     <meta property="og:image" content="/og-image.png" />
-    <meta property="og:image:alt" content="LuminaWeb Dashboard - Website Optimization Platform" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="LuminaWeb" />
+    <meta property="og:locale" content="en_US" />
     
-    <!-- Twitter -->
+    <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="LuminaWeb - Website Optimization Tool" />
     <meta name="twitter:description" content="AI-powered website optimization with real-time analytics and performance insights." />
@@ -67,8 +68,212 @@
     <!-- Page Title -->
     <title>LuminaWeb - Website Optimization Tool</title>
     
-    <!-- Critical CSS (font loading) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Enhanced Font Loading Strategy -->
+    <!-- Preload critical font weights for faster rendering -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+    
+    <!-- Font loading optimization script -->
+    <script>
+      // Enhanced font loading with fallback
+      (function() {
+        // Create font face observer
+        function loadFont(family, weight, style) {
+          return new Promise((resolve, reject) => {
+            const font = new FontFace(family, `url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2)`, {
+              weight: weight,
+              style: style,
+              display: 'swap'
+            });
+            
+            font.load().then(() => {
+              document.fonts.add(font);
+              resolve(font);
+            }).catch(reject);
+          });
+        }
+
+        // Load critical fonts
+        if ('fonts' in document) {
+          Promise.all([
+            loadFont('Inter', '400', 'normal'),
+            loadFont('Inter', '500', 'normal'),
+            loadFont('Inter', '600', 'normal')
+          ]).then(() => {
+            document.documentElement.classList.add('fonts-loaded');
+          }).catch(() => {
+            // Fallback to system fonts
+            document.documentElement.classList.add('fonts-fallback');
+          });
+        }
+
+        // Prevent FOIT (Flash of Invisible Text)
+        const fontTimeout = setTimeout(() => {
+          document.documentElement.classList.add('fonts-fallback');
+        }, 3000);
+
+        document.addEventListener('DOMContentLoaded', () => {
+          clearTimeout(fontTimeout);
+        });
+      })();
+    </script>
+    
+    <!-- Critical CSS for typography -->
+    <style>
+      /* Enhanced typography system */
+      :root {
+        --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
+        --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        
+        /* Enhanced typography scales */
+        --text-xs: 0.75rem;      /* 12px */
+        --text-sm: 0.875rem;     /* 14px */
+        --text-base: 1rem;       /* 16px */
+        --text-lg: 1.125rem;     /* 18px */
+        --text-xl: 1.25rem;      /* 20px */
+        --text-2xl: 1.5rem;      /* 24px */
+        --text-3xl: 1.875rem;    /* 30px */
+        --text-4xl: 2.25rem;     /* 36px */
+        --text-5xl: 3rem;        /* 48px */
+        --text-6xl: 3.75rem;     /* 60px */
+        --text-7xl: 4.5rem;      /* 72px */
+        
+        /* Line heights */
+        --leading-none: 1;
+        --leading-tight: 1.25;
+        --leading-snug: 1.375;
+        --leading-normal: 1.5;
+        --leading-relaxed: 1.625;
+        --leading-loose: 2;
+        
+        /* Letter spacing */
+        --tracking-tighter: -0.05em;
+        --tracking-tight: -0.025em;
+        --tracking-normal: 0em;
+        --tracking-wide: 0.025em;
+        --tracking-wider: 0.05em;
+        --tracking-widest: 0.1em;
+      }
+
+      /* Base typography styles */
+      html {
+        font-family: var(--font-primary);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+
+      body {
+        font-family: var(--font-primary);
+        font-size: var(--text-base);
+        line-height: var(--leading-normal);
+        font-weight: 400;
+        letter-spacing: var(--tracking-normal);
+      }
+
+      /* Enhanced typography hierarchy */
+      .text-display {
+        font-size: var(--text-7xl);
+        line-height: var(--leading-none);
+        font-weight: 700;
+        letter-spacing: var(--tracking-tighter);
+      }
+
+      .text-hero {
+        font-size: var(--text-6xl);
+        line-height: var(--leading-tight);
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+      }
+
+      .text-title {
+        font-size: var(--text-4xl);
+        line-height: var(--leading-tight);
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+      }
+
+      .text-heading {
+        font-size: var(--text-2xl);
+        line-height: var(--leading-snug);
+        font-weight: 600;
+        letter-spacing: var(--tracking-normal);
+      }
+
+      .text-subheading {
+        font-size: var(--text-lg);
+        line-height: var(--leading-normal);
+        font-weight: 500;
+        letter-spacing: var(--tracking-normal);
+      }
+
+      .text-body {
+        font-size: var(--text-base);
+        line-height: var(--leading-relaxed);
+        font-weight: 400;
+        letter-spacing: var(--tracking-normal);
+      }
+
+      .text-caption {
+        font-size: var(--text-sm);
+        line-height: var(--leading-normal);
+        font-weight: 400;
+        letter-spacing: var(--tracking-wide);
+      }
+
+      .text-label {
+        font-size: var(--text-xs);
+        line-height: var(--leading-normal);
+        font-weight: 500;
+        letter-spacing: var(--tracking-wider);
+        text-transform: uppercase;
+      }
+
+      /* Font loading states */
+      .fonts-loading {
+        visibility: hidden;
+      }
+
+      .fonts-loaded .fonts-loading,
+      .fonts-fallback .fonts-loading {
+        visibility: visible;
+      }
+
+      /* Responsive typography */
+      @media (max-width: 640px) {
+        .text-display { font-size: var(--text-5xl); }
+        .text-hero { font-size: var(--text-4xl); }
+        .text-title { font-size: var(--text-3xl); }
+      }
+
+      @media (max-width: 480px) {
+        .text-display { font-size: var(--text-4xl); }
+        .text-hero { font-size: var(--text-3xl); }
+        .text-title { font-size: var(--text-2xl); }
+      }
+
+      /* Performance optimizations */
+      * {
+        box-sizing: border-box;
+      }
+
+      /* Reduce layout shift */
+      img, video, iframe {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Optimize scrolling */
+      * {
+        scroll-behavior: smooth;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
     
     <!-- Preload critical resources -->
     <link rel="modulepreload" href="/src/main.tsx" />

@@ -13,7 +13,7 @@ import {
   Filter,
   Share,
   Download,
-  Refresh,
+  RefreshCw,
   Star,
   Bookmark,
   TrendingUp,
@@ -235,7 +235,7 @@ export function MobileOptimizedDashboard({
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target"
             disabled={isRefreshing}
           >
-            <Refresh className={`w-5 h-5 text-gray-700 dark:text-gray-300 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <onRefresh className={`w-5 h-5 text-gray-700 dark:text-gray-300 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </motion.header>
