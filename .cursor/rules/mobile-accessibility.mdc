@@ -1,0 +1,66 @@
+---
+description: Mobile development and accessibility best practices
+---
+
+# Mobile Development & Accessibility
+
+## Mobile-First Development
+- Start with mobile designs and progressively enhance for larger screens
+- Use [MobileOptimizedViews.tsx](mdc:src/components/mobile/MobileOptimizedViews.tsx) as the foundation
+- Implement touch gestures using Framer Motion: swipe, drag, pinch-to-zoom
+- Bottom navigation and thumb-friendly interfaces
+
+## Touch Interface Guidelines
+```tsx
+// Minimum touch target sizes
+const touchTargets = {
+  minimum: '44px', // iOS/Android standard
+  comfortable: '48px', // Recommended
+  icon: '24px', // With 12px padding
+};
+```
+
+## Mobile-Specific Features
+- Pull-to-refresh functionality
+- Swipeable cards and lists
+- Touch-friendly form inputs with proper keyboard types
+- Haptic feedback where appropriate
+- Device-specific optimizations (iOS/Android)
+
+## Responsive Breakpoints
+```css
+/* Mobile styles by default */
+@media (min-width: 640px) { /* sm */ }
+@media (min-width: 768px) { /* md */ }  
+@media (min-width: 1024px) { /* lg */ }
+@media (min-width: 1280px) { /* xl */ }
+```
+
+## Performance on Mobile
+- Lazy loading for images and components
+- Minimize JavaScript bundle size
+- Use `useMobile` hook from [useMobile.ts](mdc:src/hooks/useMobile.ts)
+- Optimize for slow networks and limited data
+
+## Accessibility Implementation
+- Semantic HTML with proper heading hierarchy (h1, h2, h3)
+- ARIA labels and descriptions for complex components
+- Focus management and keyboard navigation
+- Screen reader announcements for dynamic content
+- High contrast mode support
+
+## Input & Forms
+```tsx
+// Use semantic input types
+<input type="tel" /> // For phone numbers
+<input type="email" /> // For email addresses  
+<input type="url" /> // For URLs
+<input type="number" /> // For numeric input
+```
+
+## Testing Considerations
+- Test on real devices when possible
+- Use browser dev tools for various screen sizes
+- Verify touch interactions work correctly
+- Test with screen readers (VoiceOver, TalkBack)
+- Validate color contrast ratios

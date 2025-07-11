@@ -1,0 +1,48 @@
+---
+description: UI/UX patterns and design system guidelines
+---
+
+# UI/UX Patterns & Design System
+
+## Component Library Structure
+- Interactive components in `/src/components/ui/` 
+- Feature-specific components in organized folders (dashboard, analysis, auth)
+- Base components: [button.tsx](mdc:src/components/ui/button.tsx), [card.tsx](mdc:src/components/ui/card.tsx), [Input.tsx](mdc:src/components/ui/Input.tsx)
+- Advanced components: [InteractiveChart.tsx](mdc:src/components/charts/InteractiveChart.tsx), [DashboardWidgets.tsx](mdc:src/components/dashboard/DashboardWidgets.tsx)
+
+## Theme System
+- Use [ThemeProvider.tsx](mdc:src/components/ui/ThemeProvider.tsx) for comprehensive theming
+- Support multiple color schemes (blue, green, purple) and light/dark modes
+- CSS variables for consistent styling across components
+- High contrast and reduced motion accessibility options
+
+## Animation Guidelines
+- Use Framer Motion for all animations and transitions
+- Consistent timing: 150ms for micro-interactions, 300ms for transitions, 500ms for page changes
+- Respect `prefers-reduced-motion` for accessibility
+- Page transitions using [MotionLayout.tsx](mdc:src/components/motion/MotionLayout.tsx)
+
+## Interactive Features
+- **Charts**: Use [InteractiveChart.tsx](mdc:src/components/charts/InteractiveChart.tsx) with real-time updates, export functionality
+- **Filtering**: Implement [AdvancedFilter.tsx](mdc:src/components/ui/AdvancedFilter.tsx) for complex data filtering
+- **History**: Use [AnalysisHistory.tsx](mdc:src/components/analysis/AnalysisHistory.tsx) for timeline views and comparisons
+- **Widgets**: Drag-and-drop dashboard widgets with customizable layouts
+
+## Loading States & Feedback
+- Use [LoadingSpinner.tsx](mdc:src/components/ui/LoadingSpinner.tsx) for async operations
+- [LoadingProgress.tsx](mdc:src/components/ui/LoadingProgress.tsx) for multi-step processes
+- [Toast.tsx](mdc:src/components/ui/Toast.tsx) for user notifications
+- Skeleton loading states for better perceived performance
+
+## Responsive Design
+- Mobile-first approach with progressive enhancement
+- Use [MobileOptimizedViews.tsx](mdc:src/components/mobile/MobileOptimizedViews.tsx) for touch interfaces
+- Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)
+- Touch-friendly targets (minimum 44px tap areas)
+
+## Accessibility Standards
+- Semantic HTML elements and ARIA labels
+- Keyboard navigation support
+- Focus management and visual indicators
+- Color contrast ratios meeting WCAG AA standards
+- Screen reader compatibility

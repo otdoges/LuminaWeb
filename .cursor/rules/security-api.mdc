@@ -1,0 +1,50 @@
+---
+description: Security and API handling best practices
+---
+
+# Security & API Handling
+
+## API Security Implementation
+- Never hardcode API keys - always use environment variables
+- Use [apiSecurity.ts](mdc:src/lib/apiSecurity.ts) for all external API calls
+- Implement rate limiting and request validation via [requestValidator.ts](mdc:src/middleware/requestValidator.ts)
+- Encrypt sensitive data using the built-in encryption utilities
+
+## Environment Variables
+```bash
+# Required .env variables
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_SCRAPINGBEE_API_KEY=
+VITE_GROQ_API_KEY=
+```
+
+## Request Security Patterns
+```tsx
+import { validateRequest } from '@/middleware/requestValidator';
+import { secureApiCall } from '@/lib/apiSecurity';
+
+// Always validate user input
+const validatedData = validateRequest(userInput);
+
+// Use secure API wrapper
+const response = await secureApiCall('api-service', endpoint, options);
+```
+
+## Data Sanitization
+- Sanitize all user inputs before processing
+- Use allowlists for acceptable values
+- Validate URLs, emails, and domain inputs
+- Implement CSRF protection for forms
+
+## Rate Limiting & Monitoring
+- Implement per-user and per-IP rate limits
+- Log suspicious activity patterns
+- Use request fingerprinting to detect duplicates
+- Monitor API usage and costs
+
+## Authentication & Authorization
+- Use Supabase Auth for user management
+- Implement proper session handling
+- Check permissions before data access
+- Use secure HTTP headers and CORS configuration

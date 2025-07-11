@@ -1,0 +1,62 @@
+---
+description: Data handling, caching, and performance optimization
+---
+
+# Data Handling & Performance
+
+## API Data Management
+- Use [cachedAnalysisService.ts](mdc:src/lib/cachedAnalysisService.ts) for analysis results
+- Implement caching layer via [cachingLayer.ts](mdc:src/lib/cachingLayer.ts)
+- Rate limiting with [rateLimiter.ts](mdc:src/lib/rateLimiter.ts)
+- Historical data management in [historicalData.ts](mdc:src/lib/historicalData.ts)
+
+## Performance Optimization Strategies
+```tsx
+// React optimization patterns
+const MemoizedComponent = React.memo(Component);
+const memoizedValue = useMemo(() => expensiveCalculation(), [deps]);
+const memoizedCallback = useCallback(() => handleAction(), [deps]);
+
+// Lazy loading
+const LazyComponent = React.lazy(() => import('./Component'));
+```
+
+## Data Fetching Patterns
+- Use SWR or React Query for server state management
+- Implement optimistic updates for better UX
+- Batch API requests when possible
+- Use pagination for large datasets
+
+## Caching Strategy
+- Browser localStorage for user preferences
+- Memory cache for frequently accessed data
+- API response caching with TTL (time-to-live)
+- Image caching and lazy loading
+
+## Database Operations (Supabase)
+```tsx
+// Efficient queries with proper filtering
+const { data, error } = await supabase
+  .from('table')
+  .select('specific, fields, only')
+  .eq('status', 'active')
+  .limit(50);
+```
+
+## Performance Monitoring
+- Monitor Core Web Vitals (LCP, FID, CLS)
+- Track bundle size and load times
+- Implement error boundaries for graceful failures
+- Use React DevTools Profiler for optimization
+
+## Large Dataset Handling
+- Virtual scrolling for long lists
+- Pagination with infinite scroll
+- Data virtualization techniques
+- Progressive data loading
+
+## Memory Management
+- Clean up event listeners and subscriptions
+- Avoid memory leaks in useEffect
+- Use weak references where appropriate
+- Monitor memory usage in development

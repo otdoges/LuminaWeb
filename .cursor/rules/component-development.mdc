@@ -1,0 +1,47 @@
+---
+alwaysApply: false
+---
+# Component Development Standards
+
+## TypeScript & React Patterns
+- Always use strict TypeScript with explicit types
+- Prefer `interface` over `type` for object shapes
+- Use `React.FC` or explicit return types for components
+- Export interfaces and types for reusability
+
+## Performance Optimization
+- Use `React.memo()` for components that receive stable props
+- Use `useMemo()` and `useCallback()` for expensive calculations
+- Implement proper dependency arrays in hooks
+- Consider lazy loading for large components
+
+## Component Structure
+```tsx
+interface ComponentProps {
+  // Props interface
+}
+
+const Component = React.memo<ComponentProps>(({ props }) => {
+  // Hooks at the top
+  // Event handlers
+  // Render logic
+});
+
+export default Component;
+```
+
+## Animation & Motion
+- Always use Framer Motion for animations: `motion.div`, `AnimatePresence`
+- Follow animation patterns in [MotionLayout.tsx](mdc:src/components/motion/MotionLayout.tsx)
+- Use consistent easing and duration values from [motionConfig.ts](mdc:src/lib/motionConfig.ts)
+
+## Styling Guidelines
+- Use Tailwind classes with consistent spacing (4, 6, 8, 12, 16, 24)
+- Implement dark mode using CSS variables and Tailwind's `dark:` prefix
+- Prefer CSS Grid/Flexbox for layouts
+- Use semantic color tokens (primary, secondary, accent, muted)
+
+## State Management
+- Use local state (`useState`) for component-specific data
+- Use context for shared state: [AuthContext.tsx](mdc:src/context/AuthContext.tsx), [ThemeContext.tsx](mdc:src/context/ThemeContext.tsx)
+- Custom hooks in `/src/hooks/` for reusable logic
