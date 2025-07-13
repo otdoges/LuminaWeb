@@ -138,6 +138,26 @@ export class APISecurityManager {
     }
   }
 
+  // Execute request with security checks
+  async executeSecureRequest<T>(
+    service: string,
+    operation: () => Promise<T>,
+    identifier: string = 'default'
+  ): Promise<T> {
+    const config = this.apiKeys.get(service);
+    if (!config) {
+      throw new Error(`API key not configured for service: ${service}`);
+    }
+
+    // Check rate limit
+    if (!this.checkRateLimit(identifier, config)) {
+      throw new Error(`Rate limit exceeded for ${service}`);
+    }
+
+    // Execute the operation
+    return await operation();
+  }
+
   // Rate Limiting
   checkRateLimit(identifier: string, config: APIKeyConfig): boolean {
     const now = Date.now();
@@ -545,5 +565,40 @@ export function checkRateLimit(identifier: string, service: string): boolean {
 export function getSecureHeaders(request: Request): Headers {
   return apiSecurityManager.applySecurityHeaders(request);
 }
+
+// Export as apiSecurity for backward compatibility
+export const apiSecurity = apiSecurityManager;
+
+// Export validation rules for common use cases
+export const ValidationRules = {
+  URL: {
+    field: 'url',
+    type: 'string' as const,
+    required: true,
+    pattern: /^https?:\/\/.+/
+  },
+  EMAIL: {
+    field: 'email',
+    type: 'string' as const,
+    required: true,
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  },
+  PHONE: {
+    field: 'phone',
+    type: 'string' as const,
+    required: false,
+    pattern: /^\+?[\d\s\-\(\)]+$/
+  },
+  NUMERIC: {
+    field: 'numeric',
+    type: 'number' as const,
+    required: false
+  },
+  BOOLEAN: {
+    field: 'boolean',
+    type: 'boolean' as const,
+    required: false
+  }
+} as const;
 
 export default apiSecurityManager; 

@@ -12,6 +12,7 @@ interface ImportMetaEnv {
   readonly VITE_ENABLE_SCREENSHOTS: string
   readonly VITE_ENABLE_BULK_ANALYSIS: string
   readonly VITE_ENABLE_SCHEDULED_REPORTS: string
+  readonly VITE_PLAUSIBLE_API_KEY: string
 }
 
 interface ImportMeta {
