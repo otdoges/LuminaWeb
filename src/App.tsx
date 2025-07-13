@@ -8,7 +8,7 @@ import { EnvDebug } from './components/debug/EnvDebug';
 
 // Lazy load all page components for better performance
 const LandingPage = lazy(() => import('./pages/LandingPage').then(module => ({ default: module.LandingPage })));
-const EnhancedAuthPage = lazy(() => import('./pages/EnhancedAuthPage').then(module => ({ default: module.EnhancedAuthPage })));
+const ModernAuthPage = lazy(() => import('./pages/ModernAuthPage').then(module => ({ default: module.ModernAuthPage })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
 const AnalysisPage = lazy(() => import('./pages/AnalysisPage').then(module => ({ default: module.AnalysisPage })));
 const ChatPage = lazy(() => import('./pages/ChatPage').then(module => ({ default: module.ChatPage })));
@@ -55,7 +55,7 @@ function AppContent() {
         <Routes>
           <Route 
             path="/auth" 
-            element={isAuthenticated ? <Navigate to="/" replace /> : <EnhancedAuthPage />} 
+            element={isAuthenticated ? <Navigate to="/" replace /> : <ModernAuthPage />} 
           />
           <Route 
             path="/dashboard" 

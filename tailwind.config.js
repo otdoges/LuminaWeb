@@ -90,6 +90,8 @@ export default {
         'slideInLeft': 'slideInLeft 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
         'slideInRight': 'slideInRight 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
         'scaleIn': 'scaleIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -131,6 +133,14 @@ export default {
         shimmer: {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
+        },
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
         },
       },
       backdropBlur: {

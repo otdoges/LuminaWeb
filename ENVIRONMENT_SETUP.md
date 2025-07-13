@@ -40,6 +40,14 @@ VITE_SCRAPINGBEE_API_KEY=your_scrapingbee_api_key_here
 # Groq AI API Configuration  
 VITE_GROQ_API_KEY=your_groq_api_key_here
 
+# Analytics Provider Configuration (self-hosted)
+VITE_ANALYTICS_PROVIDER_URL=https://your-vps-analytics.domain.com
+VITE_ANALYTICS_PROVIDER_KEY=your_analytics_provider_api_key
+
+# LuminaWeb Enhancement Service
+VITE_ENHANCEMENT_SERVICE_URL=https://enhance.luminaweb.app
+VITE_ENHANCEMENT_SERVICE_API_KEY=your_enhancement_service_api_key
+
 # API Configuration
 VITE_API_TIMEOUT=30000
 
