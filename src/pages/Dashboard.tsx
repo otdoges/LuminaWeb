@@ -21,22 +21,23 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
+      staggerChildren: 0.08,
+      delayChildren: 0.1
     }
   }
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  hidden: { opacity: 0, y: 20, scale: 0.98 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
       type: "spring",
-      stiffness: 100,
-      damping: 15
+      stiffness: 120,
+      damping: 12,
+      duration: 0.6
     }
   }
 };
@@ -189,7 +190,7 @@ export function Dashboard() {
 
   const renderDashboardContent = () => (
     <motion.div 
-      className="space-y-8"
+      className="space-y-6"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -260,14 +261,14 @@ export function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
-              className="mb-6 p-4 rounded-lg bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-800/50 dark:to-accent-800/50 border border-primary-200 dark:border-primary-700"
+              className="mb-4 p-3 rounded-lg bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-800/50 dark:to-accent-800/50 border border-primary-200 dark:border-primary-700"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-primary-900 dark:text-primary-100">
+                  <h3 className="font-medium text-primary-900 dark:text-primary-100 text-sm">
                     Analytics Status
                   </h3>
-                  <p className="text-sm text-primary-600 dark:text-primary-400">
+                  <p className="text-xs text-primary-600 dark:text-primary-400">
                     {analyticsStatus.isUsingExampleData 
                       ? "You're viewing example data. Analyze a website to see real insights."
                       : `Last analyzed: ${analyticsStatus.lastAnalyzedSite || 'Unknown'}`
@@ -307,7 +308,7 @@ export function Dashboard() {
 
       {/* Enhanced Metrics Cards with Real Data */}
       <motion.div 
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
         variants={containerVariants}
       >
         {getMetricsData().map((metric, index) => (
@@ -315,9 +316,13 @@ export function Dashboard() {
             key={metric.title}
             variants={itemVariants}
             whileHover={{ 
-              scale: 1.05,
-              rotateY: 5,
-              transition: { duration: 0.3 }
+              scale: 1.03,
+              y: -4,
+              transition: { 
+                type: "spring",
+                stiffness: 400,
+                damping: 25
+              }
             }}
             whileTap={{ scale: 0.95 }}
             onHoverStart={() => setHoveredCard(metric.title)}
@@ -333,11 +338,11 @@ export function Dashboard() {
             />
             {hoveredCard === metric.title && (
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-accent-500/10 rounded-lg -z-10"
-                initial={{ opacity: 0, scale: 0.8 }}
+                className="absolute inset-0 bg-gradient-to-r from-primary-500/5 to-accent-500/5 rounded-lg -z-10 border border-primary-200/50 dark:border-primary-700/50"
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               />
             )}
           </motion.div>
@@ -419,7 +424,7 @@ export function Dashboard() {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       
       <main className="flex-1 overflow-auto">
-        <div className="p-8">
+        <div className="p-6">
           <AnimatePresence mode="wait">
             {activeTab === 'dashboard' && (
               <motion.div

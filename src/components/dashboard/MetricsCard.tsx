@@ -63,39 +63,69 @@ export function MetricsCard({
 
   return (
     <motion.div
-      className={`relative overflow-hidden rounded-xl bg-white dark:bg-primary-800 p-6 shadow-lg border ${colors.border} ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-white dark:bg-primary-800 p-5 shadow-md hover:shadow-xl border ${colors.border} ${className} backdrop-blur-sm bg-white/90 dark:bg-primary-800/90`}
       whileHover={{ 
         scale: 1.02,
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        transition: { duration: 0.2 }
+        y: -2,
+        boxShadow: '0 20px 40px -8px rgba(0, 0, 0, 0.15)',
+        transition: { 
+          type: "spring",
+          stiffness: 400,
+          damping: 25
+        }
       }}
       whileTap={{ scale: 0.98 }}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary-500/10 to-transparent" />
-        <div className="absolute top-0 left-0 w-full h-full">
-          <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-primary-500/20 to-transparent rounded-full blur-2xl" />
-          <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-accent-500/20 to-transparent rounded-full blur-xl" />
-        </div>
+      {/* Enhanced Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.03]">
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary-500/20 to-accent-500/10" />
+        <motion.div 
+          className="absolute top-2 right-2 w-16 h-16 bg-gradient-to-br from-primary-400/30 to-transparent rounded-full blur-xl"
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-2 left-2 w-12 h-12 bg-gradient-to-br from-accent-400/30 to-transparent rounded-full blur-lg"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.4, 0.2]
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
       </div>
 
       {/* Content */}
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium text-primary-600 dark:text-primary-400 theme-transition">
             {title}
           </p>
           <motion.div
-            className={`p-2 rounded-lg ${colors.accent}`}
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className={`p-2 rounded-lg ${colors.accent} backdrop-blur-sm`}
+            whileHover={{ 
+              scale: 1.1, 
+              rotate: 8,
+              backgroundColor: colors.bg + '20'
+            }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
-            <Icon className={`w-5 h-5 ${colors.text} dark:text-white`} />
+            <Icon className={`w-4 h-4 ${colors.text} dark:text-white`} />
           </motion.div>
         </div>
 
@@ -154,13 +184,26 @@ export function MetricsCard({
         </div>
 
         {/* Animated Progress Bar */}
-        <div className="mt-4 h-1 bg-primary-100 dark:bg-primary-700 rounded-full overflow-hidden">
+        <div className="mt-3 h-1 bg-primary-100 dark:bg-primary-700 rounded-full overflow-hidden">
           <motion.div
-            className={`h-full ${colors.bg} rounded-full`}
+            className={`h-full ${colors.bg} rounded-full relative`}
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(Math.abs(change) * 2, 100)}%` }}
-            transition={{ delay: 0.6, duration: 1, ease: "easeOut" }}
-          />
+            transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-white/30 rounded-full"
+              animate={{
+                x: ['-100%', '100%']
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1
+              }}
+            />
+          </motion.div>
         </div>
       </div>
 
