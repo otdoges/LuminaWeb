@@ -147,14 +147,34 @@ export function AnalysisPage() {
     const configWarning = checkAPIConfiguration();
     if (configWarning) {
       console.warn(`API Configuration Issue: ${configWarning}`);
-      // For demo purposes, return mock data when APIs are not configured
-      console.log('Returning mock analysis data for demonstration');
+      addNotification({
+        type: 'warning',
+        title: 'Using Demo Data',
+        message: 'ScrapingBee API not configured. Using realistic mock data for demonstration.',
+        duration: 5000
+      });
       return generateMockAnalysis(url);
     }
 
     try {
+      // Notify user that real analysis is starting
+      addNotification({
+        type: 'info',
+        title: 'ScrapingBee Analysis',
+        message: `Starting comprehensive analysis of ${url} using ScrapingBee API...`,
+        duration: 4000
+      });
+      
       // Perform comprehensive analysis using ScrapingBee
       const analysis = await scrapingBee.comprehensiveAnalysisWithAI(url);
+      
+      // Show progress notification for AI analysis
+      addNotification({
+        type: 'info',
+        title: 'AI Analysis in Progress',
+        message: 'Running specialized AI extraction and reasoning analysis...',
+        duration: 3000
+      });
       
       // Get enhanced AI insights using the new specialized extraction methods and reasoning analysis
       const [aiAnalysis, seoInsights, contentInsights, technicalInsights, reasoningAnalysis] = await Promise.allSettled([
