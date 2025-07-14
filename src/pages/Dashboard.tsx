@@ -420,10 +420,10 @@ export function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-primary-50 dark:bg-primary-900 flex theme-transition">
+    <div className="min-h-screen bg-primary-50 dark:bg-primary-900 theme-transition">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       
-      <main className="flex-1 overflow-auto">
+      <main className="ml-64 overflow-auto min-h-screen">
         <div className="p-6">
           <AnimatePresence mode="wait">
             {activeTab === 'dashboard' && (

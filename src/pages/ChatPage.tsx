@@ -169,22 +169,20 @@ export function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-primary-100 to-accent-50 dark:from-primary-900 dark:via-primary-800 dark:to-accent-900 flex theme-transition">
-      {/* Sidebar with liquid glass effect */}
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-primary-100 to-accent-50 dark:from-primary-900 dark:via-primary-800 dark:to-accent-900 theme-transition">
+      {/* Fixed Sidebar */}
       <div className="hidden md:block">
-        <LiquidGlass variant="panel" className="h-screen w-80 border-r-0 rounded-none">
-          <ConversationSidebar
-            conversations={conversations}
-            activeConversation={activeConversation}
-            onConversationSelect={handleConversationSelect}
-            onNewConversation={handleNewConversation}
-            onConversationsUpdate={setConversations}
-          />
-        </LiquidGlass>
+        <ConversationSidebar
+          conversations={conversations}
+          activeConversation={activeConversation}
+          onConversationSelect={handleConversationSelect}
+          onNewConversation={handleNewConversation}
+          onConversationsUpdate={setConversations}
+        />
       </div>
       
       {/* Main chat area */}
-      <div className="flex-1 flex flex-col">
+      <div className="ml-80 flex flex-col min-h-screen">
         <ChatInterface
           conversation={activeConversation}
           onConversationUpdate={handleConversationUpdate}

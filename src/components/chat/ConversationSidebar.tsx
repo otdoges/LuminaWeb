@@ -90,21 +90,46 @@ export function ConversationSidebar({
   };
 
   return (
-    <div className="w-80 bg-white dark:bg-primary-900 border-r border-primary-200 dark:border-primary-700 flex flex-col h-full theme-transition">
+    <motion.nav 
+      initial={{ x: -320, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="w-80 bg-white dark:bg-primary-900 border-r border-primary-200 dark:border-primary-700 flex flex-col fixed left-0 top-0 h-screen z-40 theme-transition shadow-lg"
+      role="navigation"
+      aria-label="Chat conversations"
+    >
       {/* Header */}
-      <div className="p-4 border-b border-primary-200 dark:border-primary-700 theme-transition">
-        <Button
-          onClick={onNewConversation}
-          className="w-full justify-start gap-2 theme-transition"
-          style={{ backgroundColor: currentTheme.accent }}
+      <motion.header 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+        className="p-4 border-b border-primary-200 dark:border-primary-700 theme-transition"
+      >
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <Plus className="w-4 h-4" />
-          New Conversation
-        </Button>
-      </div>
+          <Button
+            onClick={onNewConversation}
+            className="w-full justify-start gap-2 theme-transition focus:ring-2 focus:ring-offset-2"
+            style={{ backgroundColor: currentTheme.accent, '--tw-ring-color': currentTheme.accent } as React.CSSProperties}
+            aria-label="Start a new conversation"
+          >
+            <Plus className="w-4 h-4" aria-hidden="true" />
+            New Conversation
+          </Button>
+        </motion.div>
+      </motion.header>
 
       {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto">
+      <motion.main 
+        className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-300 dark:scrollbar-thumb-primary-600"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.3 }}
+        role="main"
+        aria-label="Conversation history"
+      >
         <AnimatePresence>
           {conversations.length === 0 ? (
             <motion.div
@@ -225,7 +250,7 @@ export function ConversationSidebar({
             ))
           )}
         </AnimatePresence>
-      </div>
-    </div>
+      </motion.main>
+    </motion.nav>
   );
 }

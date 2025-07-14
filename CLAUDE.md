@@ -146,3 +146,62 @@ VITE_ENVIRONMENT=development
 - **Input Validation**: Use `validateRequest()` from `requestValidator.ts` 
 - **Rate Limiting**: Built-in protection via `rateLimiter.ts`
 - **Data Encryption**: Use built-in encryption utilities for sensitive data
+
+## Accessibility Compliance
+
+### WCAG/ADA Standards
+This project follows WCAG 2.1 Level AA compliance standards:
+
+- **Semantic HTML**: Use proper HTML5 semantic elements (`nav`, `main`, `header`, `footer`, `section`)
+- **ARIA Labels**: Include appropriate `aria-label`, `aria-labelledby`, and `role` attributes
+- **Keyboard Navigation**: Ensure all interactive elements are keyboard accessible
+- **Focus Management**: Implement proper focus indicators and focus trapping where needed
+- **Color Contrast**: Maintain WCAG AA contrast ratios (4.5:1 for normal text, 3:1 for large text)
+- **Screen Reader Support**: Use `sr-only` classes and `aria-hidden` for decorative elements
+- **Skip Links**: Provide skip navigation for keyboard users
+
+### Accessibility Utilities
+- Use `src/lib/accessibility.ts` for contrast checking and focus management
+- Include `SkipLink` component for keyboard navigation
+- Test with screen readers and keyboard-only navigation
+
+## Git Workflow
+
+### Automatic Commits
+**IMPORTANT**: After making any code changes, always commit them immediately with descriptive commit messages.
+
+#### Required Commit Process
+1. **After any code modification**: Immediately stage and commit changes
+2. **Commit Message Format**: Use conventional commit format:
+   ```
+   feat: add new feature description
+   fix: resolve specific issue
+   style: update styling/UI improvements
+   refactor: code restructuring
+   docs: documentation updates
+   accessibility: WCAG compliance improvements
+   ```
+
+#### Git Commands to Run After Changes
+```bash
+# Stage all changes
+git add .
+
+# Commit with descriptive message
+git commit -m "feat: implement WCAG compliance improvements with semantic HTML and ARIA labels"
+
+# Push to remote (if requested by user)
+git push origin main
+```
+
+### Commit Guidelines
+- **Never skip commits**: Every modification must be committed
+- **Descriptive messages**: Explain what was changed and why
+- **Small, focused commits**: One logical change per commit
+- **Include file context**: Mention which components/files were modified
+- **Test before commit**: Ensure code builds and runs without errors
+
+### Branch Management
+- Work on `main` branch unless specifically requested otherwise
+- Create feature branches only when explicitly requested
+- Always ensure clean working directory before starting new work

@@ -45,64 +45,105 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   };
 
   return (
-    <div className="w-64 bg-white dark:bg-primary-900 border-r border-primary-200 dark:border-primary-700 flex flex-col h-full theme-transition">
+    <motion.nav 
+      initial={{ x: -280, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="w-64 bg-white dark:bg-primary-900 border-r border-primary-200 dark:border-primary-700 flex flex-col fixed left-0 top-0 h-screen z-40 theme-transition shadow-lg"
+      role="navigation"
+      aria-label="Main navigation"
+    >
       {/* Logo */}
-      <div className="p-6 border-b border-primary-200 dark:border-primary-700 theme-transition">
+      <header className="p-6 border-b border-primary-200 dark:border-primary-700 theme-transition">
         <div className="flex items-center gap-3">
           <div 
             className="p-2 rounded-lg"
             style={{ backgroundColor: `${currentTheme.accent}20` }}
           >
-            <Monitor className="w-6 h-6" style={{ color: currentTheme.accent }} />
+            <Monitor className="w-6 h-6" style={{ color: currentTheme.accent }} aria-hidden="true" />
           </div>
           <h1 className="text-xl font-bold text-primary-900 dark:text-primary-100 theme-transition">
+            <span className="sr-only">LuminaWeb - Website Analysis Platform</span>
             LuminaWeb
           </h1>
         </div>
-      </div>
+      </header>
 
       {/* Quick Actions */}
-      <div className="p-4 border-b border-primary-200 dark:border-primary-700 theme-transition">
+      <section className="p-4 border-b border-primary-200 dark:border-primary-700 theme-transition" aria-label="Quick actions">
         <Button
           size="sm"
-          className="w-full mb-3 text-white theme-transition"
-          style={{ backgroundColor: currentTheme.accent }}
+          className="w-full mb-3 text-white theme-transition focus:ring-2 focus:ring-offset-2"
+          style={{ backgroundColor: currentTheme.accent, '--tw-ring-color': currentTheme.accent } as React.CSSProperties}
           onClick={() => navigate('/analysis')}
+          aria-label="Start new website analysis"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
           Analyze Website
         </Button>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary-400" aria-hidden="true" />
           <input
             type="text"
             placeholder="Search websites..."
-            className="w-full pl-10 pr-4 py-2 border border-primary-300 dark:border-primary-600 rounded-lg text-sm bg-white dark:bg-primary-800 text-primary-900 dark:text-primary-100 focus:outline-none focus:ring-2 theme-transition"
-
+            aria-label="Search through analyzed websites"
+            className="w-full pl-10 pr-4 py-2 border border-primary-300 dark:border-primary-600 rounded-lg text-sm bg-white dark:bg-primary-800 text-primary-900 dark:text-primary-100 focus:outline-none focus:ring-2 focus:ring-offset-2 theme-transition"
+            style={{ '--tw-ring-color': currentTheme.accent } as React.CSSProperties}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
           />
         </div>
-      </div>
+      </section>
 
       {/* Navigation */}
-      <div className="flex-1 p-4">
-        <VerticalNavigation 
-          items={menuItems.map(({ id, label, icon, path }) => ({
-            id,
-            label,
-            icon,
-            active: activeTab === id,
-            onClick: () => handleMenuClick({ id, label, icon, path })
-          }))}
-          className="w-full"
-        />
-      </div>
+      <motion.section 
+        className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-300 dark:scrollbar-thumb-primary-600"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.3 }}
+        aria-label="Main navigation menu"
+      >
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.3 }}
+        >
+          <VerticalNavigation 
+            items={menuItems.map(({ id, label, icon, path }) => ({
+              id,
+              label,
+              icon,
+              active: activeTab === id,
+              onClick: () => handleMenuClick({ id, label, icon, path })
+            }))}
+            className="w-full"
+          />
+        </motion.div>
+      </motion.section>
 
       {/* User Profile & Controls */}
-      <div className="p-4 border-t border-primary-200 dark:border-primary-700 theme-transition">
-        <div className="flex items-center gap-3 mb-4">
+      <motion.footer 
+        className="p-4 border-t border-primary-200 dark:border-primary-700 theme-transition mt-auto"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.3 }}
+        aria-label="User account controls"
+      >
+        <motion.div 
+          className="flex items-center gap-3 mb-4"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          role="img"
+          aria-label={`User profile: ${user?.user_metadata?.name || user?.email?.split('@')[0]}`}
+        >
           <div 
             className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{ backgroundColor: `${currentTheme.accent}20` }}
+            role="img"
+            aria-label="User avatar"
           >
             <span 
               className="font-medium"
@@ -119,22 +160,34 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
               {user?.email}
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="flex items-center gap-2 mb-3">
+        <motion.div 
+          className="flex items-center gap-2 mb-3"
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.7, duration: 0.2 }}
+        >
           <ThemeSwitcher />
-        </div>
+        </motion.div>
 
-        <Button
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Button
           variant="ghost"
           size="sm"
           onClick={signOut}
-          className="w-full justify-start text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-800 theme-transition"
+          className="w-full justify-start text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-800 theme-transition focus:ring-2 focus:ring-offset-2"
+          style={{ '--tw-ring-color': currentTheme.accent } as React.CSSProperties}
+          aria-label="Sign out of your account"
         >
-          <LogOut className="w-4 h-4 mr-2" />
+          <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
           Logout
         </Button>
-      </div>
-    </div>
+        </motion.div>
+      </motion.footer>
+    </motion.nav>
   );
 }
