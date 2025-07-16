@@ -1,0 +1,30 @@
+{
+  "enabled": true,
+  "name": "Documentation Sync",
+  "description": "Monitors all TypeScript source files, configuration files, and project files for changes and automatically updates documentation in README.md and docs folder to keep them in sync with code changes",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "enhancement-service/src/**/*.ts",
+      "enhancement-service/src/**/*.tsx",
+      "*.ts",
+      "*.tsx",
+      "*.js",
+      "*.jsx",
+      "package.json",
+      "enhancement-service/package.json",
+      "tsconfig*.json",
+      "vite.config.ts",
+      "next.config.js",
+      "tailwind.config.js",
+      "eslint.config.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Source code files have been modified in this TypeScript React project. Please review the changes and update the documentation accordingly. Update the README.md file and any relevant files in the /docs folder to reflect any new features, API changes, configuration updates, or architectural modifications. Ensure the documentation accurately describes the current state of the codebase, including any new components, services, or functionality that has been added or modified."
+  }
+}

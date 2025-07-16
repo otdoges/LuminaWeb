@@ -230,7 +230,8 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 <Button 
                   size="lg" 
                   onClick={onGetStarted} 
-                  className="w-full sm:w-auto group relative overflow-hidden theme-transition"
+                  className="w-full sm:w-auto group relative overflow-hidden theme-transition text-white"
+                  style={{ backgroundColor: currentTheme.accent }}
                 >
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"

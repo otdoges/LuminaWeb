@@ -1,0 +1,27 @@
+{
+  "enabled": true,
+  "name": "Auto Git Commit",
+  "description": "Automatically creates git commit messages and commits changes after every file modification, with error handling and recovery",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*",
+      "enhancement-service/**/*",
+      "*.ts",
+      "*.tsx",
+      "*.js",
+      "*.jsx",
+      "*.json",
+      "*.md",
+      "*.css",
+      "*.html",
+      "*.config.js",
+      "*.config.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file has been modified in the project. Please:\n\n1. Analyze the changes that were made\n2. Create an appropriate git commit message that describes the changes clearly and concisely\n3. Stage the changes using `git add .`\n4. Commit the changes with the generated message using `git commit -m \"your message\"`\n5. If there are any git errors (like merge conflicts, authentication issues, etc.), diagnose and fix them, then retry the commit\n6. Continue working and be ready for the next file change\n\nFollow conventional commit format when possible (feat:, fix:, docs:, style:, refactor:, test:, chore:) and keep messages under 72 characters for the subject line."
+  }
+}

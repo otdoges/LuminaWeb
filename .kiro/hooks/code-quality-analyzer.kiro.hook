@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "name": "Code Quality Analyzer",
+  "description": "Monitors source code files for changes and provides automated code quality analysis with suggestions for improvements, code smells detection, and best practices recommendations",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "enhancement-service/src/**/*.ts",
+      "enhancement-service/src/**/*.tsx",
+      "*.js",
+      "*.ts",
+      "*.jsx",
+      "*.tsx"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze the modified code files for potential improvements. Focus on:\n\n1. **Code Smells**: Identify any code smells like long functions, duplicate code, complex conditionals, or inappropriate naming\n2. **Design Patterns**: Suggest better design patterns or architectural improvements\n3. **Best Practices**: Check adherence to React, TypeScript, and JavaScript best practices\n4. **Performance**: Identify potential performance optimizations\n5. **Readability**: Suggest improvements for code clarity and maintainability\n6. **Type Safety**: Ensure proper TypeScript usage and type definitions\n\nFor each suggestion, provide:\n- Clear explanation of the issue\n- Specific code improvement recommendation\n- Reasoning for why the change would be beneficial\n- Priority level (High/Medium/Low)\n\nConsider the project context: This is a React TypeScript application using Vite, Tailwind CSS, and Supabase, with a separate Next.js enhancement service. Maintain consistency with the existing codebase patterns and architecture."
+  }
+}

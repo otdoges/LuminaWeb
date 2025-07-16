@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "name": "ADA Compliance Monitor",
+  "description": "Monitors front-end files for ADA compliance and accessibility standards, checking React components, HTML templates, and styling files for proper semantic markup, ARIA attributes, color contrast, keyboard navigation, and other accessibility requirements",
+  "version": "1",
+  "when": {
+    "type": "userTriggered",
+    "patterns": [
+      "src/components/**/*.tsx",
+      "src/pages/**/*.tsx",
+      "src/**/*.tsx",
+      "index.html",
+      "src/index.css",
+      "src/styles/**/*.css",
+      "tailwind.config.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the modified front-end files for ADA compliance and accessibility standards. Check for:\n\n1. **Semantic HTML**: Proper use of heading hierarchy (h1-h6), landmarks (nav, main, aside, footer), and semantic elements\n2. **ARIA Attributes**: Required aria-label, aria-describedby, aria-expanded, role attributes where needed\n3. **Keyboard Navigation**: Ensure all interactive elements are keyboard accessible with proper focus management\n4. **Color Contrast**: Verify text/background color combinations meet WCAG AA standards (4.5:1 for normal text, 3:1 for large text)\n5. **Alt Text**: All images have descriptive alt attributes or are marked as decorative\n6. **Form Accessibility**: Labels properly associated with inputs, error messages accessible\n7. **Focus Indicators**: Visible focus states for all interactive elements\n8. **Screen Reader Support**: Content is properly structured for screen readers\n9. **Motion/Animation**: Respect prefers-reduced-motion settings\n10. **Mobile Accessibility**: Touch targets are at least 44px, content is responsive\n\nProvide specific recommendations for any accessibility violations found, including code examples for fixes. Prioritize issues by severity (critical, high, medium, low) based on their impact on users with disabilities."
+  }
+}
