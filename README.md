@@ -48,7 +48,7 @@ A modern, AI-powered website analysis platform built with React, TypeScript, and
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/luminaweb.git
+   git clone https://github.com/otdoges/luminaweb.git
    cd luminaweb
    ```
 
