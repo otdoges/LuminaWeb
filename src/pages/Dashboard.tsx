@@ -14,6 +14,7 @@ import { detectAnalyticsStatus, getUserAnalyses, type AnalyticsStatus } from '..
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { useSEO } from '../hooks/useSEO';
 
 // Enhanced animation variants
 const containerVariants = {
@@ -59,6 +60,9 @@ export function Dashboard() {
   const [analyticsStatus, setAnalyticsStatus] = useState<AnalyticsStatus | null>(null);
   const [userAnalyses, setUserAnalyses] = useState<any[]>([]);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
+
+  // SEO for dashboard page
+  useSEO();
   const navigate = useNavigate();
   const { currentTheme } = useTheme();
   const { user } = useAuth();

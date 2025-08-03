@@ -15,6 +15,7 @@ import { ModernPerformanceChart } from '../components/analysis/ModernPerformance
 import { HorizontalNavigation } from '../components/ui/navigation';
 import { BarChart3, LineChart, TrendingUp, Eye } from 'lucide-react';
 import { reportGenerator, ReportData, ReportOptions } from '../lib/reportGenerator';
+import { useSEO } from '../hooks/useSEO';
 
 export function AnalysisPage() {
   const navigate = useNavigate();
@@ -24,6 +25,9 @@ export function AnalysisPage() {
   const [configurationWarning, setConfigurationWarning] = useState<string | null>(null);
   const [showModernCharts, setShowModernCharts] = useState(false);
   const { addNotification } = useNotifications();
+
+  // SEO for analysis page
+  useSEO();
   
   // Check API configuration status
   const checkAPIConfiguration = () => {

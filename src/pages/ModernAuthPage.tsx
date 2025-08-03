@@ -25,6 +25,7 @@ import {
   Sun,
   Loader2
 } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -69,6 +70,9 @@ export function ModernAuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // SEO for auth page
+  useSEO();
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [rememberMe, setRememberMe] = useState(false);

@@ -20,6 +20,7 @@ import { ThemeSwitcher } from '../components/ui/ThemeSwitcher';
 import { AnimatedSection } from '../components/ui/AnimatedSection';
 import { LoadingProgress } from '../components/ui/LoadingProgress';
 import { useTheme } from '../context/ThemeContext';
+import { useSEO, structuredDataTemplates } from '../hooks/useSEO';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -29,6 +30,11 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const { currentTheme } = useTheme();
   const { scrollY } = useScroll();
+
+  // SEO optimization for landing page
+  useSEO({
+    structuredData: structuredDataTemplates.website
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
